@@ -26,19 +26,14 @@
 *
 */
 
-import {readEnvironmentVariable} from '@natlibfi/melinda-record-import-commons';
+import {Utils} from '@natlibfi/melinda-commons';
 
-export const BLOB_ID = readEnvironmentVariable('BLOB_ID');
-export const PROFILE_ID = readEnvironmentVariable('PROFILE_ID');
+const {readEnvironmentVariable} = Utils;
 
-export const API_URL = readEnvironmentVariable('API_URL');
-export const API_USERNAME = readEnvironmentVariable('API_USERNAME');
-export const API_PASSWORD = readEnvironmentVariable('API_PASSWORD');
+export const CATALOGER_ID = readEnvironmentVariable('CATALOGER_ID', {defaultValue: 'IMP_HELMET'});
 
-export const AMQP_URL = readEnvironmentVariable('AMQP_URL');
 export const SRU_URL = readEnvironmentVariable('SRU_URL');
-
-export const CATALOGER_ID = readEnvironmentVariable('CATALOGER_ID', 'IMP_HELMET');
+export const SRU_URL_PROD = readEnvironmentVariable('SRU_URL_PROD');
 
 export const RECORD_LOAD_URL = readEnvironmentVariable('RECORD_LOAD_URL');
 export const RECORD_LOAD_API_KEY = readEnvironmentVariable('RECORD_LOAD_API_KEY');
