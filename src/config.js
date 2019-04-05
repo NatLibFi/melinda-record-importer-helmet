@@ -28,7 +28,7 @@
 
 import {Utils} from '@natlibfi/melinda-commons';
 
-const {readEnvironmentVariable} = Utils;
+const {readEnvironmentVariable, parseBoolean} = Utils;
 
 export const CATALOGER_ID = readEnvironmentVariable('CATALOGER_ID', {defaultValue: 'IMP_HELMET'});
 
@@ -38,3 +38,5 @@ export const SRU_URL_PROD = readEnvironmentVariable('SRU_URL_PROD');
 export const RECORD_LOAD_URL = readEnvironmentVariable('RECORD_LOAD_URL');
 export const RECORD_LOAD_API_KEY = readEnvironmentVariable('RECORD_LOAD_API_KEY');
 export const RECORD_LOAD_LIBRARY = readEnvironmentVariable('RECORD_LOAD_LIBRARY');
+
+export const NOOP_MELINDA_IMPORT = readEnvironmentVariable('NOOP_MELINDA_IMPORT', {defaultValue: false, format: parseBoolean});

@@ -31,18 +31,21 @@
 import {MarcRecord} from '@natlibfi/marc-record';
 import {Utils, RecordMatching, Datastore} from '@natlibfi/melinda-commons';
 import {RECORD_IMPORT_STATE} from '@natlibfi/melinda-record-import-commons';
-import {CATALOGER_ID, SRU_URL, SRU_URL_PROD, RECORD_LOAD_URL, RECORD_LOAD_API_KEY, RECORD_LOAD_LIBRARY} from './config';
+import {
+	CATALOGER_ID, SRU_URL, SRU_URL_PROD, NOOP_MELINDA_IMPORT,
+	RECORD_LOAD_URL, RECORD_LOAD_API_KEY, RECORD_LOAD_LIBRARY
+} from './config';
 
 const {createLogger, getRecordTag} = Utils;
-const {createBibService: createMatchingService} = RecordMatching;
+const {createSimpleBibService: createMatchingService} = RecordMatching;
 const {createService: createDatastoreService} = Datastore;
 
 MarcRecord.setValidationOptions({subfieldValues: false});
 
 export default function () {
 	const Logger = createLogger();
-	const ProdMatchingService = createMatchingService({sruURL: SRU_URL_PROD, maxDuplicates: 1, ignoreNegativeFeatures: true});
-	const MatchingService = createMatchingService({sruURL: SRU_URL, maxDuplicates: 1});
+	const ProdMatchingService = createMatchingService({sruURL: SRU_URL_PROD, maxCandidatesPerQuery: 1});
+	const MatchingService = createMatchingService({sruURL: SRU_URL, maxCandidatesPerQuery: 1});
 	const DatastoreService = createDatastoreService({
 		sruURL: SRU_URL,
 		recordLoadURL: RECORD_LOAD_URL,
@@ -51,7 +54,11 @@ export default function () {
 	});
 
 	return async message => {
-		Logger.log('debug', 'Importing record to Melinda');		
+		if (NOOP_MELINDA_IMPORT) {
+			Logger.log('debug', 'NOOP_MELINDA_IMPORT is set. Not importing anything');
+		} else {
+			Logger.log('debug', 'Importing record to Melinda');
+		}
 
 		const record = new MarcRecord(JSON.parse(message.content.toString()));
 		const tag = getRecordTag(record);
@@ -64,10 +71,14 @@ export default function () {
 			return {status: RECORD_IMPORT_STATE.duplicate, metadata: {matches, tag, wouldImportToProd}};
 		}
 
+		if (NOOP_MELINDA_IMPORT) {
+			return {status: RECORD_IMPORT_STATE.skipped, metadata: {tag, wouldImportToProd}};
+		}
+
 		Logger.log('debug', 'Importing record to datastore...');
 		const id = await DatastoreService.create({record, cataloger: CATALOGER_ID});
-		Logger.log('debug', `Created new record ${id}`);
 
+		Logger.log('debug', `Created new record ${id}`);
 		return {status: RECORD_IMPORT_STATE.created, metadata: {id, tag, wouldImportToProd}};
 
 		async function checkProdImport() {
