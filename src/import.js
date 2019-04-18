@@ -68,18 +68,18 @@ export default function () {
 		const wouldImportToProd = await checkProdImport();
 
 		if (matches.length > 0) {
-			return {status: RECORD_IMPORT_STATE.duplicate, metadata: {matches, tag, wouldImportToProd}};
+			return {status: RECORD_IMPORT_STATE.DUPLICATE, metadata: {matches, tag, wouldImportToProd}};
 		}
 
 		if (NOOP_MELINDA_IMPORT) {
-			return {status: RECORD_IMPORT_STATE.skipped, metadata: {tag, wouldImportToProd}};
+			return {status: RECORD_IMPORT_STATE.SKIPPED, metadata: {tag, wouldImportToProd}};
 		}
 
 		Logger.log('debug', 'Importing record to datastore...');
 		const id = await DatastoreService.create({record, cataloger: CATALOGER_ID});
 
 		Logger.log('debug', `Created new record ${id}`);
-		return {status: RECORD_IMPORT_STATE.created, metadata: {id, tag, wouldImportToProd}};
+		return {status: RECORD_IMPORT_STATE.CREATED, metadata: {id, tag, wouldImportToProd}};
 
 		async function checkProdImport() {
 			Logger.log('debug', 'Trying to find matches for record in production...');
