@@ -31,7 +31,7 @@
 	},
 	"dependencies": {
 		"@natlibfi/melinda-commons": "^6.0.0",
-		"@natlibfi/melinda-record-import-commons": "^4.0.0"
+		"@natlibfi/melinda-record-import-commons": "https://github.com/natlibfi/melinda-record-import-commons#feature-state-mgmt"
 	},
 	"devDependencies": {
 		"@babel/cli": "^7.2.0",
