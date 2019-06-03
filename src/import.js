@@ -31,18 +31,20 @@
 import {MarcRecord} from '@natlibfi/marc-record';
 import {Utils, RecordMatching, Datastore} from '@natlibfi/melinda-commons';
 import {RECORD_IMPORT_STATE} from '@natlibfi/melinda-record-import-commons';
-import {CATALOGER_ID, SRU_URL, SRU_URL_PROD, RECORD_LOAD_URL, RECORD_LOAD_API_KEY, RECORD_LOAD_LIBRARY} from './config';
+import {
+	CATALOGER_ID, SRU_URL, NOOP_MELINDA_IMPORT,
+	RECORD_LOAD_URL, RECORD_LOAD_API_KEY, RECORD_LOAD_LIBRARY
+} from './config';
 
-const {createLogger, getRecordTag} = Utils;
-const {createBibService: createMatchingService} = RecordMatching;
+const {createLogger, getRecordTitle, getRecordStandardIdentifiers} = Utils;
+const {createSimpleBibService: createMatchingService} = RecordMatching;
 const {createService: createDatastoreService} = Datastore;
 
 MarcRecord.setValidationOptions({subfieldValues: false});
 
 export default function () {
 	const Logger = createLogger();
-	const ProdMatchingService = createMatchingService({sruURL: SRU_URL_PROD, maxDuplicates: 1, ignoreNegativeFeatures: true});
-	const MatchingService = createMatchingService({sruURL: SRU_URL, maxDuplicates: 1});
+	const MatchingService = createMatchingService({sruURL: SRU_URL, maxCandidatesPerQuery: 1});
 	const DatastoreService = createDatastoreService({
 		sruURL: SRU_URL,
 		recordLoadURL: RECORD_LOAD_URL,
@@ -51,32 +53,31 @@ export default function () {
 	});
 
 	return async message => {
-		Logger.log('debug', 'Importing record to Melinda');		
+		if (NOOP_MELINDA_IMPORT) {
+			Logger.log('info', 'NOOP_MELINDA_IMPORT is set. Not importing anything');
+		} else {
+			Logger.log('info', 'Importing record to Melinda');
+		}
 
 		const record = new MarcRecord(JSON.parse(message.content.toString()));
-		const tag = getRecordTag(record);
+		const title = getRecordTitle(record);
+		const standardIdentifiers = getRecordStandardIdentifiers(record);
 
-		Logger.log('debug', 'Trying to find matches for record (Test)...');
+		Logger.log('debug', 'Trying to find matches for record...');
 		const matches = await MatchingService.find(record);
-		const wouldImportToProd = await checkProdImport();
 
 		if (matches.length > 0) {
-			return {status: RECORD_IMPORT_STATE.duplicate, metadata: {matches, tag, wouldImportToProd}};
+			return {status: RECORD_IMPORT_STATE.DUPLICATE, metadata: {matches, title, standardIdentifiers}};
 		}
 
-		Logger.log('debug', 'Importing record to datastore...');
+		if (NOOP_MELINDA_IMPORT) {
+			return {status: RECORD_IMPORT_STATE.SKIPPED, metadata: {title, standardIdentifiers}};
+		}
+
+		Logger.log('info', 'Importing record to datastore...');
 		const id = await DatastoreService.create({record, cataloger: CATALOGER_ID});
-		Logger.log('debug', `Created new record ${id}`);
 
-		return {status: RECORD_IMPORT_STATE.created, metadata: {id, tag, wouldImportToProd}};
-
-		async function checkProdImport() {
-			Logger.log('debug', 'Trying to find matches for record in production...');
-			if ((await ProdMatchingService.find(record)).length === 0) {
-				return true;
-			}
-
-			return false;
-		}
+		Logger.log('info', `Created new record ${id}`);
+		return {status: RECORD_IMPORT_STATE.CREATED, metadata: {id, title, standardIdentifiers}};
 	};
 }

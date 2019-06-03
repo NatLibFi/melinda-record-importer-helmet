@@ -26,16 +26,10 @@
 *
 */
 
-import {Utils} from '@natlibfi/melinda-commons';
+import {Importer} from '@natlibfi/melinda-record-import-commons';
+import importFactory from './import';
 
-const {readEnvironmentVariable, parseBoolean} = Utils;
+const {runCLI} = Importer;
+const callback = importFactory();
 
-export const CATALOGER_ID = readEnvironmentVariable('CATALOGER_ID', {defaultValue: 'IMP_HELMET'});
-
-export const SRU_URL = readEnvironmentVariable('SRU_URL');
-
-export const RECORD_LOAD_URL = readEnvironmentVariable('RECORD_LOAD_URL');
-export const RECORD_LOAD_API_KEY = readEnvironmentVariable('RECORD_LOAD_API_KEY');
-export const RECORD_LOAD_LIBRARY = readEnvironmentVariable('RECORD_LOAD_LIBRARY');
-
-export const NOOP_MELINDA_IMPORT = readEnvironmentVariable('NOOP_MELINDA_IMPORT', {defaultValue: false, format: parseBoolean});
+runCLI({name: 'melinda-record-import-importer-helmet', callback});
