@@ -30,7 +30,7 @@
 
 import {MarcRecord} from '@natlibfi/marc-record';
 import {Utils} from '@natlibfi/melinda-commons';
-
+import {RECORD_IMPORT_STATE} from '@natlibfi/melinda-record-import-commons';
 
 const {createLogger, getRecordTitle, getRecordStandardIdentifiers} = Utils;
 
@@ -41,6 +41,7 @@ export default function () {
 	const Logger = createLogger();
 
 	return async message => {
+
 		Logger.log('info', 'Not importing anything to Melinda, just logging!');
 
 		const record = new MarcRecord(JSON.parse(message.content.toString()));
@@ -64,5 +65,7 @@ export default function () {
 			})
 			Logger.log('info', '---------')
 		})
+
+		return {status: RECORD_IMPORT_STATE.SKIPPED, metadata: {title, standardIdentifiers}};
 	};
 }
