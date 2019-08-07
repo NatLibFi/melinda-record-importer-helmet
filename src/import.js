@@ -41,7 +41,6 @@ export default function () {
 	const Logger = createLogger();
 
 	return async message => {
-
 		Logger.log('info', 'Not importing anything to Melinda, just logging!');
 
 		const record = new MarcRecord(JSON.parse(message.content.toString()));
@@ -54,17 +53,17 @@ export default function () {
 		// Logging to file needs new function to Melinda-commons-js/utils
 		Logger.log('info', 'Got record for importing:');
 		Logger.log('info', 'Record title: ' + title);
-		Logger.log('info', 'Standard identifiers: ' +standardIdentifiers);
+		Logger.log('info', 'Standard identifiers: ' + standardIdentifiers);
 		Logger.log('info', 'Records fields to be imported:');
 		recordFields.forEach(field => {
-			Logger.log('info', 'Tag: ' + field.tag)
-			Logger.log('info', 'Subfields:')
+			Logger.log('info', 'Tag: ' + field.tag);
+			Logger.log('info', 'Subfields:');
 			field.subfield.forEach(sub => {
-				Logger.log('info', 'Code: ' + sub.code)
-				Logger.log('info', 'Value: ' + sub.value)
-			})
-			Logger.log('info', '---------')
-		})
+				Logger.log('info', 'Code: ' + sub.code);
+				Logger.log('info', 'Value: ' + sub.value);
+			});
+			Logger.log('info', '---------');
+		});
 
 		return {status: RECORD_IMPORT_STATE.SKIPPED, metadata: {title, standardIdentifiers}};
 	};
