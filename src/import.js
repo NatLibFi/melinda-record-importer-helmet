@@ -51,16 +51,16 @@ export default function () {
 		// Logs record and it's subfields to info channel
 		// Possibility to add enviromental variable to change log location
 		// Logging to file needs new function to Melinda-commons-js/utils
-		Logger.log('info', 'Got record for importing:');
-		Logger.log('info', 'Record title: ' + title);
-		Logger.log('info', 'Standard identifiers: ' + standardIdentifiers);
-		Logger.log('info', 'Records fields to be imported:');
+		Logger.log('info', `Got record for importing:
+							Record title: ${title}
+							Standard identifiers: ${standardIdentifiers}
+							Records fields to be imported:`);
 		recordFields.forEach(field => {
-			Logger.log('info', 'Tag: ' + field.tag);
-			Logger.log('info', 'Subfields:');
+			Logger.log('info', `Tag: ${field.tag}
+								Subfields:`);
 			field.subfield.forEach(sub => {
-				Logger.log('info', 'Code: ' + sub.code);
-				Logger.log('info', 'Value: ' + sub.value);
+				Logger.log('info', `Code: ${sub.code}
+									Value: ${sub.value}`);
 			});
 			Logger.log('info', '---------');
 		});
