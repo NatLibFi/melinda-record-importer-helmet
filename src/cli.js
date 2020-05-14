@@ -27,9 +27,9 @@
 */
 
 import {Importer} from '@natlibfi/melinda-record-import-commons';
-import importFactory from './import';
+import {createImportCallback} from './import';
 
 const {runCLI} = Importer;
-const callback = importFactory();
+const callback = createImportCallback();
 
 runCLI({name: 'melinda-record-import-importer-helmet', callback});
