@@ -35,7 +35,7 @@ import {
 import httpStatus from 'http-status';
 
 export function createImportCallback() {
-  const {createLogger, getRecordTitle, getRecordStandardIdentifiers} = Utils;
+  const {createLogger, getRecordTitle, getRecordStandardIdentifiers, logError} = Utils;
   const logger = createLogger();
   const apiClient = createApiClient({
     restApiUrl,
@@ -51,10 +51,11 @@ export function createImportCallback() {
     const title = getRecordTitle(record);
     const standardIdentifiers = getRecordStandardIdentifiers(record);
 
-    logger.log('info', 'Sending record to rest-api-http...');
-    // Params: noop & unique
+    logger.log('verbose', 'Sending record to rest-api-http...');
     try {
-      const response = await apiClient.postPrio({params: {noop: noopMelindaImport}, contentType: 'application/marc', body: record});
+      // Params: noop: do validations only & unique: import even if duplicate
+      // Content type is what transformer returns
+      const response = await apiClient.postPrio({params: {noop: noopMelindaImport, unique: 1}, contentType: 'application/json', body: JSON.stringify(record.toObject())});
       logger.log('debug', JSON.stringify(response));
       const {id, data} = response;
 
@@ -71,14 +72,24 @@ export function createImportCallback() {
       logger.log('verbose', 'Got unexpected response');
       throw new ApiError(httpStatus.INTERNAL_SERVER_ERROR, 'Unexpected response');
     } catch (error) {
-      logger.log('error', error);
 
       if (error.status === httpStatus.CONFLICT) {
         logger.log('verbose', 'Got expected conflict response');
         return {status: RECORD_IMPORT_STATE.DUPLICATE, metadata: {matches: error.payload, title, standardIdentifiers}};
       }
 
-      return {status: RECORD_IMPORT_STATE.ERROR, metadata: {title, standardIdentifiers, error: error.payload}};
+      if (error.status === httpStatus.UNPROCESSABLE_ENTITY) {
+        logger.log('verbose', 'Got expected unprosessable entity response');
+        return {status: RECORD_IMPORT_STATE.INVALID, metadata: {validationMessages: error.payload, title, standardIdentifiers}};
+      }
+
+      if (error.status === httpStatus.FORBIDDEN) {
+        logger.log('verbose', 'Got expected unprosessable entity response');
+        return {status: RECORD_IMPORT_STATE.INVALID, metadata: {validationMessages: error.payload, title, standardIdentifiers}};
+      }
+
+      logError(error);
+      throw error;
     }
   };
 }

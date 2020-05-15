@@ -31,7 +31,7 @@
 	},
 	"dependencies": {
 		"@natlibfi/melinda-commons": "git+https://github.com/NatLibFi/melinda-commons-js.git#melkehitys-1541",
-		"@natlibfi/melinda-record-import-commons": "^6.0.2",
+		"@natlibfi/melinda-record-import-commons": "8.0.0",
 		"http-status": "^1.4.2"
 	},
 	"devDependencies": {
