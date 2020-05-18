@@ -31,7 +31,7 @@
 	},
 	"dependencies": {
 		"@natlibfi/melinda-commons": "git+https://github.com/NatLibFi/melinda-commons-js.git#melkehitys-1541",
-		"@natlibfi/melinda-record-import-commons": "8.0.0",
+		"@natlibfi/melinda-record-import-commons": "^8.0.0",
 		"http-status": "^1.4.2"
 	},
 	"devDependencies": {
@@ -40,7 +40,7 @@
 		"@babel/node": "^7.8.7",
 		"@babel/preset-env": "^7.9.6",
 		"@babel/register": "^7.9.0",
-		"@natlibfi/eslint-config-melinda-backend": ">1.0.0-alpha.1",
+		"@natlibfi/eslint-config-melinda-backend": "^1.0.0",
 		"babel-eslint": "^10.1.0",
 		"cross-env": "^7.0.2",
 		"eslint": "^7.0.0",
