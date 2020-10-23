@@ -1,3 +1,4 @@
+---
 kind: pipeline
 name: default
 steps:
@@ -25,3 +26,8 @@ steps:
   when:
     branch: [master, test]
 event: [push, tag]
+---
+kind: signature
+hmac: 2c236d94f93963a5cff40b7ce06e3f2cdd87e9d95fc0aaad4ac32818d4783e8a
+
+...
