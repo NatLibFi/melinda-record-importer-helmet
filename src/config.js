@@ -26,14 +26,16 @@
 *
 */
 
-import {readEnvironmentVariable} from '@natlibfi/melinda-backend-commons';
-import {parseBoolean} from '@natlibfi/melinda-commons';
+import {Utils} from '@natlibfi/melinda-commons';
 
-export const restApiOptions = {
-  restApiUrl: readEnvironmentVariable('MELINDA_API_URL'),
-  restApiUsername: readEnvironmentVariable('MELINDA_API_USERNAME'),
-  restApiPassword: readEnvironmentVariable('MELINDA_API_PASSWORD')
-};
+const {readEnvironmentVariable, parseBoolean} = Utils;
 
-export const logLevel = readEnvironmentVariable('LOG_LEVEL', {defaultValue: 'info'});
-export const noopMelindaImport = readEnvironmentVariable('NOOP_MELINDA_IMPORT', {defaultValue: false, format: parseBoolean});
+export const CATALOGER_ID = readEnvironmentVariable('CATALOGER_ID', {defaultValue: 'IMP_HELMET'});
+
+export const SRU_URL = readEnvironmentVariable('SRU_URL');
+
+export const RECORD_LOAD_URL = readEnvironmentVariable('RECORD_LOAD_URL');
+export const RECORD_LOAD_API_KEY = readEnvironmentVariable('RECORD_LOAD_API_KEY');
+export const RECORD_LOAD_LIBRARY = readEnvironmentVariable('RECORD_LOAD_LIBRARY');
+
+export const NOOP_MELINDA_IMPORT = readEnvironmentVariable('NOOP_MELINDA_IMPORT', {defaultValue: false, format: parseBoolean});
