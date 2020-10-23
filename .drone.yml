@@ -10,11 +10,11 @@ steps:
   - chmod o+w /drone/src
 - name: test
   image: node:8
-  user: node  
+  user: node
   commands:
   - npm install
   - npm test
-- name: docker 
+- name: docker
   image: plugins/docker
   settings:
     repo: quay.io/natlibfi/melinda-record-import-importer-helmet
@@ -27,7 +27,15 @@ steps:
     branch: [master, test]
 event: [push, tag]
 ---
+kind: secret
+name: docker_username
+data: MhMGGOsj5qIy1Xj5wnCtpOtCqZ+tbR9RO+4KXdx9H/OiIJamQwmVxwv5W44WrZX7fqQ=
+---
+kind: secret
+name: docker_password
+data: 8a0n4yrVV96WuAw+LhCN0NQ8XnFswPiZJUjkOPkfsxuZIJ+RqG36ODAWlSlXaC272QLa3NxnJWTDgdZ8MCZ19guah32EZbrw8ps9ujiF+tLpjg4DoQ8sMWwdyx4=
+---
 kind: signature
-hmac: 2c236d94f93963a5cff40b7ce06e3f2cdd87e9d95fc0aaad4ac32818d4783e8a
+hmac: 190c714a37ae7fc9e92dc31c0288371a9417ad9706abae1ae9460b4d6ab1e2fb
 
 ...
