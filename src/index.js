@@ -26,8 +26,6 @@
 *
 */
 
-/* eslint-disable import/default */
-
 import {Importer} from '@natlibfi/melinda-record-import-commons';
 import createImportCallback from './import';
 
