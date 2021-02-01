@@ -26,9 +26,8 @@
 *
 */
 
-import {Utils} from '@natlibfi/melinda-commons';
-
-const {readEnvironmentVariable, parseBoolean} = Utils;
+import {readEnvironmentVariable} from '@natlibfi/melinda-backend-commons';
+import {parseBoolean} from '@natlibfi/melinda-commons';
 
 export const CATALOGER_ID = readEnvironmentVariable('CATALOGER_ID', {defaultValue: 'IMP_HELMET'});
 
