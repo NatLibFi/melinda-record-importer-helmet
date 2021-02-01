@@ -43,47 +43,47 @@ export const NOOP_MELINDA_IMPORT = readEnvironmentVariable('NOOP_MELINDA_IMPORT'
 const recordType = readEnvironmentVariable('RECORD_TYPE', {defaultValue: 'bib'});
 
 export const matchOptions = {
-    maxMatches: readEnvironmentVariable('MAX_MATCHES', {
-        defaultValue: 1, format: v => Number(v)
-    }),
-    maxCandidates: readEnvironmentVariable('MAX_CANDIDATES', {defaultValue: 25, format: v => Number(v)}),
-    search: {
-        url: readEnvironmentVariable('SRU_URL'),
-        searchSpec: generateSearchSpec()
-    },
-    detection: {
-        treshold: readEnvironmentVariable('MATCHING_TRESHOLD', {defaultValue: 0.9, format: v => Number(v)}),
-        strategy: generateStrategy()
-    }
+  maxMatches: readEnvironmentVariable('MAX_MATCHES', {
+    defaultValue: 1, format: v => Number(v)
+  }),
+  maxCandidates: readEnvironmentVariable('MAX_CANDIDATES', {defaultValue: 25, format: v => Number(v)}),
+  search: {
+    url: readEnvironmentVariable('SRU_URL'),
+    searchSpec: generateSearchSpec()
+  },
+  detection: {
+    treshold: readEnvironmentVariable('MATCHING_TRESHOLD', {defaultValue: 0.9, format: v => Number(v)}),
+    strategy: generateStrategy()
+  }
 };
 
 function generateStrategy() {
-    if (recordType === 'bib') {
-        return [
-            matchDetection.features.bib.hostComponent(),
-            matchDetection.features.bib.isbn(),
-            matchDetection.features.bib.issn(),
-            matchDetection.features.bib.otherStandardIdentifier(),
-            matchDetection.features.bib.title(),
-            matchDetection.features.bib.authors(),
-            matchDetection.features.bib.recordType(),
-            matchDetection.features.bib.publicationTime(),
-            matchDetection.features.bib.language(),
-            matchDetection.features.bib.bibliographicLevel()
-        ];
-    }
+  if (recordType === 'bib') {
+    return [
+      matchDetection.features.bib.hostComponent(),
+      matchDetection.features.bib.isbn(),
+      matchDetection.features.bib.issn(),
+      matchDetection.features.bib.otherStandardIdentifier(),
+      matchDetection.features.bib.title(),
+      matchDetection.features.bib.authors(),
+      matchDetection.features.bib.recordType(),
+      matchDetection.features.bib.publicationTime(),
+      matchDetection.features.bib.language(),
+      matchDetection.features.bib.bibliographicLevel()
+    ];
+  }
 
-    throw new Error('Unsupported record type');
+  throw new Error('Unsupported record type');
 }
 
 function generateSearchSpec() {
-    if (recordType === 'bib') {
-        return [
-            candidateSearch.searchTypes.bib.hostComponents,
-            candidateSearch.searchTypes.bib.standardIdentifiers,
-            candidateSearch.searchTypes.bib.title
-        ];
-    }
+  if (recordType === 'bib') {
+    return [
+      candidateSearch.searchTypes.bib.hostComponents,
+      candidateSearch.searchTypes.bib.standardIdentifiers,
+      candidateSearch.searchTypes.bib.title
+    ];
+  }
 
-    throw new Error('Unsupported record type');
+  throw new Error('Unsupported record type');
 }
