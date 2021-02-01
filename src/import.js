@@ -27,14 +27,15 @@
 */
 
 import {MarcRecord} from '@natlibfi/marc-record';
-import {Utils, RecordMatching, Datastore} from '@natlibfi/melinda-commons';
+import {getRecordTitle, getRecordStandardIdentifiers} from '@natlibfi/melinda-commons';
+import {createLogger} from '@natlibfi/melinda-backend-commons';
 import {RECORD_IMPORT_STATE} from '@natlibfi/melinda-record-import-commons';
 import {
   CATALOGER_ID, SRU_URL, NOOP_MELINDA_IMPORT,
-  RECORD_LOAD_URL, RECORD_LOAD_API_KEY, RECORD_LOAD_LIBRARY
+  RECORD_LOAD_URL, RECORD_LOAD_API_KEY, RECORD_LOAD_LIBRARY, matchOptions
 } from './config';
+import createMatchInterface from '@natlibfi/melinda-record-matching';
 
-const {createLogger, getRecordTitle, getRecordStandardIdentifiers} = Utils;
 const {createSimpleBibService: createMatchingService} = RecordMatching;
 const {createService: createDatastoreService} = Datastore;
 
@@ -42,6 +43,7 @@ MarcRecord.setValidationOptions({subfieldValues: false});
 
 export default function () {
   const Logger = createLogger();
+  const match = createMatchInterface(matchOptions);
   const MatchingService = createMatchingService({sruURL: SRU_URL, maxCandidatesPerQuery: 1});
   const DatastoreService = createDatastoreService({
     sruURL: SRU_URL,
@@ -62,10 +64,11 @@ export default function () {
     const standardIdentifiers = getRecordStandardIdentifiers(record);
 
     Logger.log('debug', 'Trying to find matches for record...');
-    const matches = await MatchingService.find(record);
+    const matches = await match(record);
 
     if (matches.length > 0) {
-      return {status: RECORD_IMPORT_STATE.DUPLICATE, metadata: {matches, title, standardIdentifiers}};
+      const matchedIds = matchResults.map(({candidate: {id}}) => id);
+      return {status: RECORD_IMPORT_STATE.DUPLICATE, metadata: {matches, title, standardIdentifiers: matchedIds}};
     }
 
     if (NOOP_MELINDA_IMPORT) {
