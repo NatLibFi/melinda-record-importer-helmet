@@ -27,7 +27,7 @@
 */
 
 import {MarcRecord} from '@natlibfi/marc-record';
-import {Utils, Datastore} from '@natlibfi/melinda-commons';
+import {getRecordTitle, getRecordStandardIdentifiers, Datastore} from '@natlibfi/melinda-commons';
 import {createLogger} from '@natlibfi/melinda-backend-commons';
 import {RECORD_IMPORT_STATE} from '@natlibfi/melinda-record-import-commons';
 import {
@@ -36,7 +36,6 @@ import {
 } from './config';
 import createMatchInterface from '@natlibfi/melinda-record-matching';
 
-const {getRecordTitle, getRecordStandardIdentifiers} = Utils;
 const {createService: createDatastoreService} = Datastore;
 
 MarcRecord.setValidationOptions({subfieldValues: false});
