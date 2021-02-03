@@ -66,7 +66,7 @@ export default function () {
 
     if (matches.length > 0) {
       const matchedIds = matches.map(({candidate: {id}}) => id);
-      return {status: RECORD_IMPORT_STATE.DUPLICATE, metadata: {matches, title, standardIdentifiers: matchedIds}};
+      return {status: RECORD_IMPORT_STATE.DUPLICATE, metadata: {title, standardIdentifiers: matchedIds}};
     }
 
     if (NOOP_MELINDA_IMPORT) {
