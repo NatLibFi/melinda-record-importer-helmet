@@ -28,62 +28,12 @@
 
 import {readEnvironmentVariable} from '@natlibfi/melinda-backend-commons';
 import {parseBoolean} from '@natlibfi/melinda-commons';
-import {candidateSearch, matchDetection} from '@natlibfi/melinda-record-matching';
 
-export const CATALOGER_ID = readEnvironmentVariable('CATALOGER_ID', {defaultValue: 'IMP_HELMET'});
-
-export const SRU_URL = readEnvironmentVariable('SRU_URL');
-
-export const RECORD_LOAD_URL = readEnvironmentVariable('RECORD_LOAD_URL');
-export const RECORD_LOAD_API_KEY = readEnvironmentVariable('RECORD_LOAD_API_KEY');
-export const RECORD_LOAD_LIBRARY = readEnvironmentVariable('RECORD_LOAD_LIBRARY');
-
-export const NOOP_MELINDA_IMPORT = readEnvironmentVariable('NOOP_MELINDA_IMPORT', {defaultValue: false, format: parseBoolean});
-
-const recordType = readEnvironmentVariable('RECORD_TYPE', {defaultValue: 'bib'});
-
-export const matchOptions = {
-  maxMatches: readEnvironmentVariable('MAX_MATCHES', {
-    defaultValue: 1, format: v => Number(v)
-  }),
-  maxCandidates: readEnvironmentVariable('MAX_CANDIDATES', {defaultValue: 25, format: v => Number(v)}),
-  search: {
-    url: readEnvironmentVariable('SRU_URL'),
-    searchSpec: generateSearchSpec()
-  },
-  detection: {
-    treshold: readEnvironmentVariable('MATCHING_TRESHOLD', {defaultValue: 0.9, format: v => Number(v)}),
-    strategy: generateStrategy()
-  }
+export const restApiOptions = {
+  restApiUrl: readEnvironmentVariable('MELINDA_API_URL'),
+  restApiUsername: readEnvironmentVariable('MELINDA_API_USERNAME'),
+  restApiPassword: readEnvironmentVariable('MELINDA_API_PASSWORD')
 };
 
-function generateStrategy() {
-  if (recordType === 'bib') {
-    return [
-      matchDetection.features.bib.hostComponent(),
-      matchDetection.features.bib.isbn(),
-      matchDetection.features.bib.issn(),
-      matchDetection.features.bib.otherStandardIdentifier(),
-      matchDetection.features.bib.title(),
-      matchDetection.features.bib.authors(),
-      matchDetection.features.bib.recordType(),
-      matchDetection.features.bib.publicationTime(),
-      matchDetection.features.bib.language(),
-      matchDetection.features.bib.bibliographicLevel()
-    ];
-  }
-
-  throw new Error('Unsupported record type');
-}
-
-function generateSearchSpec() {
-  if (recordType === 'bib') {
-    return [
-      candidateSearch.searchTypes.bib.hostComponents,
-      candidateSearch.searchTypes.bib.standardIdentifiers,
-      candidateSearch.searchTypes.bib.title
-    ];
-  }
-
-  throw new Error('Unsupported record type');
-}
+export const logLevel = readEnvironmentVariable('LOG_LEVEL', {defaultValue: 'info'});
+export const noopMelindaImport = readEnvironmentVariable('NOOP_MELINDA_IMPORT', {defaultValue: false, format: parseBoolean});
