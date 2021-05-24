@@ -37,3 +37,4 @@ export const restApiOptions = {
 
 export const logLevel = readEnvironmentVariable('LOG_LEVEL', {defaultValue: 'info'});
 export const noopMelindaImport = readEnvironmentVariable('NOOP_MELINDA_IMPORT', {defaultValue: false, format: parseBoolean});
+export const catalogerId = readEnvironmentVariable('CATALOGER_ID', {defaultValue: false});
