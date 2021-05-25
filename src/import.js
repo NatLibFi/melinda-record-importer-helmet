@@ -32,7 +32,7 @@ import {getRecordTitle, getRecordStandardIdentifiers} from '@natlibfi/melinda-co
 import {createLogger} from '@natlibfi/melinda-backend-commons';
 import {RECORD_IMPORT_STATE} from '@natlibfi/melinda-record-import-commons';
 import {createApiClient} from '@natlibfi/melinda-rest-api-client';
-import {noopMelindaImport, restApiOptions, logLevel} from './config';
+import {noopMelindaImport, catalogerId, restApiOptions, logLevel} from './config';
 
 export default function () {
   const logger = createLogger(logLevel);
@@ -50,7 +50,7 @@ export default function () {
 
     try {
       logger.log('info', 'Importing record to Melinda...');
-      const {recordId: id} = await apiClient.create(record, {unique: true});
+      const {recordId: id} = await apiClient.create(record, {unique: 1, noop: 0, cataloger: catalogerId ? catalogerId : undefined});
 
       logger.log('info', `Created new record ${id}`);
       return {status: RECORD_IMPORT_STATE.CREATED, metadata: {id, title, standardIdentifiers}};
