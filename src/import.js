@@ -44,26 +44,47 @@ export default function () {
     const standardIdentifiers = getRecordStandardIdentifiers(record);
 
     if (noopMelindaImport) {
-      logger.log('info', 'NOOP set. Not importing anything');
+      logger.info('NOOP set. Not importing anything');
       return {status: RECORD_IMPORT_STATE.SKIPPED, metadata: {title, standardIdentifiers}};
     }
 
     try {
-      logger.log('info', 'Importing record to Melinda...');
+      logger.info('Importing record to Melinda...');
       const {recordId: id} = await apiClient.create(record, {unique: 1, noop: 0, cataloger: catalogerId ? catalogerId : undefined});
 
-      logger.log('info', `Created new record ${id}`);
+      logger.info(`Created new record ${id}`);
       return {status: RECORD_IMPORT_STATE.CREATED, metadata: {id, title, standardIdentifiers}};
-    } catch (err) {
-      if (err.status) {
-        if (err.status === httpStatus.CONFLICT) {
-          return {status: RECORD_IMPORT_STATE.DUPLICATE, metadata: {matches: err.payload, title, standardIdentifiers}};
+    } catch (error) {
+      if (error.status) {
+        if (error.status === httpStatus.CONFLICT) {
+          return {status: RECORD_IMPORT_STATE.DUPLICATE, metadata: {matches: error.payload, title, standardIdentifiers}};
         }
 
-        throw new Error(`Melinda REST API error: ${err.status} ${err.payload || ''}`);
+        if (error.status === httpStatus.UNPROCESSABLE_ENTITY) {
+          logger.error('Got expected unprosessable entity response');
+          return {status: RECORD_IMPORT_STATE.INVALID, metadata: {validationMessages: error.payload, title, standardIdentifiers}};
+        }
+
+        if (error.status === httpStatus.FORBIDDEN) {
+          logger.error('Got permission error response');
+          return {status: RECORD_IMPORT_STATE.ERROR, metadata: {validationMessages: error.payload, title, standardIdentifiers}};
+        }
+
+        if (error.status === httpStatus.INTERNAL_SERVER_ERROR) {
+          logger.error('Got expected internal server error response');
+          return {status: RECORD_IMPORT_STATE.INVALID, metadata: {validationMessages: 'Invalid record data', title, standardIdentifiers}};
+        }
+
+        if (error.status === httpStatus.REQUEST_TIMEOUT) {
+          logger.error('Got request timeout from server as response. Restarting importter!');
+          throw new Error(`Melinda REST API Request timeout error: ${error.status} ${error.payload || ''}`);
+        }
+
+        logger.error('Got request timeout from server as response. Restarting importter!');
+        throw new Error(`Melinda REST API error: ${error.status} ${error.payload || ''}`);
       }
 
-      throw err;
+      throw error;
     }
   };
 }
