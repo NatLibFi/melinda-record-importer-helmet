@@ -72,7 +72,7 @@ export default function () {
 
         if (error.status === httpStatus.INTERNAL_SERVER_ERROR) {
           logger.error('Got expected internal server error response');
-          return {status: RECORD_IMPORT_STATE.INVALID, metadata: {validationMessages: 'Invalid record data', title, standardIdentifiers}};
+          return {status: RECORD_IMPORT_STATE.ERROR, metadata: {validationMessages: 'Invalid record data', title, standardIdentifiers}};
         }
 
         if (error.status === httpStatus.REQUEST_TIMEOUT) {
@@ -80,7 +80,7 @@ export default function () {
           throw new Error(`Melinda REST API Request timeout error: ${error.status} ${error.payload || ''}`);
         }
 
-        logger.error('Got request timeout from server as response. Restarting importter!');
+        logger.error('Unexpected error occured in rest api. Restarting importter!');
         throw new Error(`Melinda REST API error: ${error.status} ${error.payload || ''}`);
       }
 
