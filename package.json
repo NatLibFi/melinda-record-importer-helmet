@@ -38,7 +38,7 @@
 		"@natlibfi/marc-record": "^6.1.1",
 		"@natlibfi/melinda-backend-commons": "^2.0.5",
 		"@natlibfi/melinda-commons": "^12.0.0",
-		"@natlibfi/melinda-record-import-commons": "git+https://github.com/NatLibFi/melinda-record-import-commons-js.git#next",
+		"@natlibfi/melinda-record-import-commons": "git@github.com:NatLibFi/melinda-record-import-commons-js.git#next",
 		"@natlibfi/melinda-rest-api-client": "^1.0.1",
 		"http-status": "^1.5.0"
 	},
