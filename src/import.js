@@ -40,6 +40,8 @@ export default function () {
 
   return async message => {
     const record = new MarcRecord(JSON.parse(message.content.toString()), {subfieldValues: false});
+    logger.debug('Record data to be imported');
+    logger.debug(JSON.stringify(record));
     const title = getRecordTitle(record);
     const standardIdentifiers = getRecordStandardIdentifiers(record);
 
