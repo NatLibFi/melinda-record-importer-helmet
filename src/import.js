@@ -68,21 +68,6 @@ export default function () {
           return {status: RECORD_IMPORT_STATE.INVALID, metadata: {validationMessages: error.payload, title, standardIdentifiers}};
         }
 
-        if (error.status === httpStatus.FORBIDDEN) {
-          logger.error('Got permission error response');
-          return {status: RECORD_IMPORT_STATE.ERROR, metadata: {validationMessages: error.payload, title, standardIdentifiers}};
-        }
-
-        if (error.status === httpStatus.INTERNAL_SERVER_ERROR) {
-          logger.error('Got expected internal server error response');
-          return {status: RECORD_IMPORT_STATE.ERROR, metadata: {validationMessages: 'Invalid record data', title, standardIdentifiers}};
-        }
-
-        if (error.status === httpStatus.REQUEST_TIMEOUT) {
-          logger.error('Got request timeout from server as response. Restarting importter!');
-          throw new Error(`Melinda REST API Request timeout error: ${error.status} ${error.payload || ''}`);
-        }
-
         logger.error('Unexpected error occured in rest api. Restarting importter!');
         throw new Error(`Melinda REST API error: ${error.status} ${error.payload || ''}`);
       }
