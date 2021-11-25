@@ -39,11 +39,12 @@ export default function () {
   const apiClient = createApiClient(restApiOptions);
 
   return async message => {
-    const record = new MarcRecord(JSON.parse(message.content.toString()), {subfieldValues: false}).toObject();
-    logger.debug('Record data to be imported');
-    logger.debug(JSON.stringify(record));
+    const record = new MarcRecord(JSON.parse(message.content.toString()), {subfieldValues: false});
     const title = getRecordTitle(record);
     const standardIdentifiers = getRecordStandardIdentifiers(record);
+    logger.debug(`Record data to be imported: Title: ${title}, identifiers: ${standardIdentifiers}`);
+    const recordObject = record.toObject()
+    logger.debug(JSON.stringify(recordObject));
 
     if (noopMelindaImport) {
       logger.info('NOOP set. Not importing anything');
@@ -52,7 +53,7 @@ export default function () {
 
     try {
       logger.info('Importing record to Melinda...');
-      const {recordId: id} = await apiClient.create(record, {unique: 1, noop: 0, cataloger: catalogerId ? catalogerId : undefined});
+      const {recordId: id} = await apiClient.create(recordObject, {unique: 1, noop: 0, cataloger: catalogerId ? catalogerId : undefined});
 
       logger.info(`Created new record ${id}`);
       return {status: RECORD_IMPORT_STATE.CREATED, metadata: {id, title, standardIdentifiers}};
