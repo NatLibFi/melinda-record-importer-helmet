@@ -39,7 +39,7 @@ export default function () {
   const apiClient = createApiClient(restApiOptions);
 
   return async message => {
-    const record = new MarcRecord(JSON.parse(message.content.toString()), {subfieldValues: false});
+    const record = new MarcRecord(JSON.parse(message.content.toString()), {subfieldValues: false}).toObject();
     logger.debug('Record data to be imported');
     logger.debug(JSON.stringify(record));
     const title = getRecordTitle(record);
