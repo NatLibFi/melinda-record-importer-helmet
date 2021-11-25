@@ -40,10 +40,10 @@ export default function () {
 
   return async message => {
     const record = new MarcRecord(JSON.parse(message.content.toString()), {subfieldValues: false});
-    const title = getRecordTitle(record);
-    const standardIdentifiers = getRecordStandardIdentifiers(record);
+    const title = await getRecordTitle(record);
+    const standardIdentifiers = await getRecordStandardIdentifiers(record);
     logger.debug(`Record data to be imported: Title: ${title}, identifiers: ${standardIdentifiers}`);
-    const recordObject = record.toObject()
+    const recordObject = record.toObject();
     logger.debug(JSON.stringify(recordObject));
 
     if (noopMelindaImport) {
