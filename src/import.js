@@ -40,30 +40,39 @@ export default function () {
 
   return async message => {
     const record = new MarcRecord(JSON.parse(message.content.toString()), {subfieldValues: false});
-    const title = getRecordTitle(record);
-    const standardIdentifiers = getRecordStandardIdentifiers(record);
+    const title = await getRecordTitle(record);
+    const standardIdentifiers = await getRecordStandardIdentifiers(record);
+    logger.debug(`Record data to be imported: Title: ${title}, identifiers: ${standardIdentifiers}`);
+    const recordObject = record.toObject();
+    logger.debug(JSON.stringify(recordObject));
 
     if (noopMelindaImport) {
-      logger.log('info', 'NOOP set. Not importing anything');
+      logger.info('NOOP set. Not importing anything');
       return {status: RECORD_IMPORT_STATE.SKIPPED, metadata: {title, standardIdentifiers}};
     }
 
     try {
-      logger.log('info', 'Importing record to Melinda...');
-      const {recordId: id} = await apiClient.create(record, {unique: 1, noop: 0, cataloger: catalogerId ? catalogerId : undefined});
+      logger.info('Importing record to Melinda...');
+      const {recordId: id} = await apiClient.create(recordObject, {unique: 1, noop: 0, cataloger: catalogerId ? catalogerId : undefined});
 
-      logger.log('info', `Created new record ${id}`);
+      logger.info(`Created new record ${id}`);
       return {status: RECORD_IMPORT_STATE.CREATED, metadata: {id, title, standardIdentifiers}};
-    } catch (err) {
-      if (err.status) {
-        if (err.status === httpStatus.CONFLICT) {
-          return {status: RECORD_IMPORT_STATE.DUPLICATE, metadata: {matches: err.payload, title, standardIdentifiers}};
+    } catch (error) {
+      if (error.status) {
+        if (error.status === httpStatus.CONFLICT) {
+          return {status: RECORD_IMPORT_STATE.DUPLICATE, metadata: {matches: error.payload, title, standardIdentifiers}};
         }
 
-        throw new Error(`Melinda REST API error: ${err.status} ${err.payload || ''}`);
+        if (error.status === httpStatus.UNPROCESSABLE_ENTITY) {
+          logger.error('Got expected unprosessable entity response');
+          return {status: RECORD_IMPORT_STATE.INVALID, metadata: {validationMessages: error.payload, title, standardIdentifiers}};
+        }
+
+        logger.error('Unexpected error occured in rest api. Restarting importter!');
+        throw new Error(`Melinda REST API error: ${error.status} ${error.payload || ''}`);
       }
 
-      throw err;
+      throw error;
     }
   };
 }
