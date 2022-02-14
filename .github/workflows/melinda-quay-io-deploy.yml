@@ -1,4 +1,4 @@
-name: Melinda Quay.io publish
+name: Melinda Quayio publish
 
 on:
   workflow_run:
