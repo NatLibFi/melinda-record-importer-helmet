@@ -1,0 +1,40 @@
+name: melinda-quay-io-publish
+
+on:
+  workflow_run:
+    workflows: ["Melinda node.js"]
+    types:
+      - completed
+
+jobs:
+  build:
+    env:
+      image_name: ${{ github.repository }}
+      GIT_EVENT_NAME: ${{ github.event_name }}
+      GIT_REF_NAME: ${{ github.ref_name }}
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@master
+      - name: Get image tags
+        id: image_tags
+        run: |
+          echo -n ::set-output name=IMAGE_TAGS::
+          if test "$GIT_EVENT_NAME" = 'push';then
+            if test "$GIT_REF_NAME" = 'master';then
+              echo "latest"
+            elif test "$GIT_REF_NAME" = 'main';then
+              echo "latest"
+            else
+              echo "$GIT_REF_NAME"
+            fi
+          else test "$GIT_EVENT_NAME" = 'tag';then
+            echo "$GIT_REF_NAME"
+          fi
+      - name: Build and publish image to Quay
+        uses: docker/build-push-action@v1
+        with:
+          registry: quay.io
+          repository: natlibfi/${{ env.image_name }}
+          username: ${{ secrets.MELINDA_QUAY_IO_USERNAME }}
+          password: ${{ secrets.MELINDA_QUAY_IO_PASSWORD }}
+          tags: "${{ steps.image_tags.outputs.IMAGE_TAGS }}"
