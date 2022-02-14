@@ -1,12 +1,12 @@
-# Melinda node.js
+# Melinda node tests
 
-name: Melinda node.js
+name: Melinda node tests
 
 on: push
 
 jobs:
   build-node-versions:
-
+    name: Node version matrix 12, 14 & 16
     runs-on: ubuntu-latest
 
     strategy:
@@ -30,9 +30,10 @@ jobs:
     - run: npm run build --if-present
 
   njsscan:
+    name: Njsscan check
     needs: build-node-versions
     runs-on: ubuntu-latest
-    name: njsscan check
+
     steps:
     - name: Checkout the code
       uses: actions/checkout@v2
