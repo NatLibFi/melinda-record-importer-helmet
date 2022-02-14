@@ -2,7 +2,7 @@ name: Melinda Quay.io publish
 
 on:
   workflow_run:
-    workflows: ["Melinda node.js"]
+    workflows: [Melinda node.js]
     types:
       - completed
 
