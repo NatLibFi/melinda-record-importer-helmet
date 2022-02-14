@@ -2,13 +2,12 @@ name: Melinda Quay.io publish
 
 on:
   workflow_run:
-    workflows: [Melinda node tests]
-    types:
-      - completed
+    workflows: Melinda node tests
+    types: completed
 
 jobs:
   build:
-
+    name: Image builder & deployer
     runs-on: ubuntu-latest
 
     env:
