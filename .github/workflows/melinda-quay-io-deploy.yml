@@ -1,8 +1,6 @@
 name: Melinda Quayio publish
 
 on:
-  tag:
-  - '*'
   workflow_run:
     workflows: [Melinda node tests]
     types: [completed]
