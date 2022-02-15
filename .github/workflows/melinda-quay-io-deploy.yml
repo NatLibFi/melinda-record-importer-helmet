@@ -1,8 +1,12 @@
 name: Melinda Quayio publish
 
 on:
+  push:
+  - '*'
+  tag:
+  - '*'
   workflow_run:
-    workflows: Melinda node tests
+    workflows: Njsscan check
     types: completed
 
 jobs:
