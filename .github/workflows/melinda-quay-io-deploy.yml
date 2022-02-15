@@ -4,7 +4,7 @@ on:
   workflow_run:
     workflows: [Melinda node tests]
     types: [completed]
-    branches: [*]
+    branches: ['*']
 
 jobs:
   on-success:
