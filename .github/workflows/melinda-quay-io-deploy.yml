@@ -2,7 +2,7 @@ name: Melinda Quayio publish
 
 on:
   workflow_run:
-    workflows: [Njsscan check]
+    workflows: [Melinda node tests]
     types: [completed]
 
 jobs:
