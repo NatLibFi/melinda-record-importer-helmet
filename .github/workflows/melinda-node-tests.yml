@@ -59,7 +59,7 @@ jobs:
         id: meta
         uses: docker/metadata-action@v3
         with:
-          images: name/app
+          images: natlibfi/${{ github.repository }}
           tags: |
             type=ref,event=branch
             type=ref,event=pr
@@ -69,7 +69,6 @@ jobs:
         uses: docker/login-action@v1
         with:
           registry: quay.io
-          repository: natlibfi/${{ env.image_name }}
           username: ${{ secrets.MELINDA_QUAY_IO_USERNAME }}
           password: ${{ secrets.MELINDA_QUAY_IO_PASSWORD }}
       - name: Build and publish image to Quay
