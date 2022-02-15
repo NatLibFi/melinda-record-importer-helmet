@@ -58,8 +58,7 @@ jobs:
       - name: Get image tags
         id: image_tags
         run: |
-          echo "$GIT_EVENT_NAME"
-          echo "$GIT_REF_NAME"
+          echo "$GIT_EVENT_NAME" && echo "$GIT_REF_NAME" && \
           echo -n ::set-output name=IMAGE_TAGS::
           if test "$GIT_EVENT_NAME" = 'push';then
             if test "$GIT_REF_NAME" = 'master';then
@@ -69,7 +68,7 @@ jobs:
             else
               echo "$GIT_REF_NAME"
             fi
-          else test "$GIT_EVENT_NAME" = 'tag';then
+          elif test "$GIT_EVENT_NAME" = 'tag';then
             echo "$GIT_REF_NAME"
           fi
       - name: Build and publish image to Quay
