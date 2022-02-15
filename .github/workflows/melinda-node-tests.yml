@@ -58,6 +58,8 @@ jobs:
       - name: Get image tags
         id: image_tags
         run: |
+          echo "$GIT_EVENT_NAME"
+          echo "$GIT_REF_NAME"
           echo -n ::set-output name=IMAGE_TAGS::
           if test "$GIT_EVENT_NAME" = 'push';then
             if test "$GIT_REF_NAME" = 'master';then
