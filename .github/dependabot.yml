@@ -24,16 +24,17 @@ updates:
     allow:
       - dependency-type: "production"
 
-  # Major updates to npm dependencies weekly @friday
-  - package-ecosystem: "npm"
-    directory: "/"
-    schedule:
-      interval: "weekly"
-      day: "tuesday"
-      time: "07:00"
-      timezone: "Europe/Helsinki"
-    versioning-strategy: increase-if-necessary
-    labels:
-      - "npm major dependencies"
-    reviewers:
-      - "natlibfi/melinda-js-lead"
+  # Major updates to npm dependencies weekly @tuesday
+  # Not possible yet https://github.com/dependabot/dependabot-core/issues/1778
+  # - package-ecosystem: "npm"
+  #   directory: "/"
+  #   schedule:
+  #     interval: "weekly"
+  #     day: "tuesday"
+  #     time: "07:00"
+  #     timezone: "Europe/Helsinki"
+  #   versioning-strategy: increase-if-necessary
+  #   labels:
+  #     - "npm major dependencies"
+  #   reviewers:
+  #     - "natlibfi/melinda-js-lead"
