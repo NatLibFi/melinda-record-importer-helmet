@@ -28,8 +28,8 @@ updates:
   - package-ecosystem: "npm"
     directory: "/"
     schedule:
-      interval: "tuesday"
-      day: "friday"
+      interval: "weekly"
+      day: "tuesday"
       time: "07:00"
       timezone: "Europe/Helsinki"
     versioning-strategy: increase-if-necessary
