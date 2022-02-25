@@ -1,0 +1,24 @@
+{
+  "correlationId": "FOO",
+  "cataloger": "xxx0000",
+  "oCatalogerIn": "xxx0000",
+  "operation": "CREATE",
+  "queueItemState": "DONE",
+  "handledRecords": [],
+  "rejectedRecords": [
+    {
+      "status": "DUPLICATE",
+      "title": "example",
+      "standardIdentifiers": [
+        "978-952-373-345-9"
+      ],
+      "sourceId": "(MALLI)0239734",
+      "blobf001": "001234567",
+      "dublicateIds": [
+        "001234567"
+      ]
+    }
+  ],
+  "errorStatus": "",
+  "errorMessage": ""
+}

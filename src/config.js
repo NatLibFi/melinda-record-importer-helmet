@@ -29,12 +29,25 @@
 import {readEnvironmentVariable} from '@natlibfi/melinda-backend-commons';
 import {parseBoolean} from '@natlibfi/melinda-commons';
 
-export const restApiOptions = {
-  restApiUrl: readEnvironmentVariable('MELINDA_API_URL'),
-  restApiUsername: readEnvironmentVariable('MELINDA_API_USERNAME'),
-  restApiPassword: readEnvironmentVariable('MELINDA_API_PASSWORD')
-};
+export const profileId = readEnvironmentVariable('PROFILE_ID');
+export const amqpUrl = readEnvironmentVariable('AMQP_URL');
+export const importOfflinePeriod = readEnvironmentVariable('IMPORT_OFFLINE_PERIOD');
 
 export const logLevel = readEnvironmentVariable('LOG_LEVEL', {defaultValue: 'info'});
-export const noopMelindaImport = readEnvironmentVariable('NOOP_MELINDA_IMPORT', {defaultValue: false, format: parseBoolean});
-export const catalogerId = readEnvironmentVariable('CATALOGER_ID', {defaultValue: false});
+export const noopProcessing = readEnvironmentVariable('NOOP_PROCESSING', {defaultValue: false, format: parseBoolean});
+export const noopMelindaImport = readEnvironmentVariable('NOOP_MELINDA_IMPORT', {defaultValue: '0'});
+export const uniqueMelindaImport = readEnvironmentVariable('UNIQUE_MELINDA_IMPORT', {defaultValue: '1'});
+
+export const recordImportApiOptions = {
+  recordImportApiUrl: readEnvironmentVariable('RECORD_IMPORT_API_URL'),
+  recordImportApiUsername: readEnvironmentVariable('RECORD_IMPORT_API_USERNAME'),
+  recordImportApiPassword: readEnvironmentVariable('RECORD_IMPORT_API_PASSWORD'),
+  userAgent: readEnvironmentVariable('API_CLIENT_USER_AGENT', {defaultValue: '_RECORD-IMPORT-IMPORTER'})
+};
+
+export const melindaApiOptions = {
+  melindaApiUrl: readEnvironmentVariable('MELINDA_API_URL', {defaultValue: false}),
+  melindaApiUsername: readEnvironmentVariable('MELINDA_API_USERNAME', {defaultValue: ''}),
+  melindaApiPassword: readEnvironmentVariable('MELINDA_API_PASSWORD', {defaultValue: ''}),
+  cataloger: readEnvironmentVariable('CATALOGER_ID', {defaultValue: false})
+};

@@ -1,0 +1,43 @@
+{
+  "description": "Handle transformed blob - Importing, no messages",
+  "configs": {
+    "blobId": "000",
+    "profileId": "foobar",
+    "amqpUrl": "amqp://foo.bar/",
+    "importOfflinePeriod": "{\"startHour\":22, \"lengthHours\":9}",
+    "logLevel": "info",
+    "noopProcessing": true,
+    "noopMelindaImport": "0",
+    "uniqueMelindaImport": "1"
+  },
+  "requests": [
+    {
+      "method": "post",
+      "url": "/auth",
+      "status": 204,
+      "responseHeaders":{
+        "Token": "0-0-0"
+      }
+    },
+    {
+      "method": "get",
+      "url": "/blobs/000",
+      "status": 200
+    },
+    {
+      "method": "get",
+      "url": "/bulk/state/000",
+      "status": 200
+    },
+    {
+      "method": "put",
+      "url": "/bulk/state/0-0-0?status=PENDING_QUEUING",
+      "status": 200
+    },
+    {
+      "method": "post",
+      "url": "/blobs/000",
+      "status": 204
+    }
+  ]
+}

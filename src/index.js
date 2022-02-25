@@ -4,7 +4,7 @@
 *
 * Helmet record importer for the Melinda record batch import system
 *
-* Copyright (c) 2019 University Of Helsinki (The National Library Of Finland)
+* Copyright (c) 2019-2022 University Of Helsinki (The National Library Of Finland)
 *
 * This file is part of melinda-record-import-importer-helmet
 *
@@ -26,11 +26,49 @@
 *
 */
 
-import {Importer} from '@natlibfi/melinda-record-import-commons';
-import createImportCallback from './import';
+import {handleInterrupt, createLogger} from '@natlibfi/melinda-backend-commons';
+import * as config from './config';
+import startApp from './app';
+import {createApiClient as createRecordImportApiClient} from '@natlibfi/melinda-record-import-commons';
+import {createApiClient as createMelindaApiClient} from '@natlibfi/melinda-rest-api-client';
+import amqplib from 'amqplib';
 
-const {startImporter} = Importer;
-const importCallback = createImportCallback();
+const logger = createLogger();
+run();
 
-startImporter(importCallback);
+async function run() {
+  registerInterruptionHandlers();
 
+  const riApiClient = createRecordImportApiClient(config.recordImportApiOptions);
+  const melindaApiClient = createMelindaApiClient(config.melindaApiOptions);
+
+  await startApp(config, riApiClient, melindaApiClient, amqplib);
+
+  function registerInterruptionHandlers() {
+    process
+      .on('SIGTERM', handleSignal)
+      .on('SIGINT', handleInterrupt)
+      .on('uncaughtException', ({stack}) => {
+        handleTermination({code: 1, message: stack});
+      })
+      .on('unhandledRejection', ({stack}) => {
+        handleTermination({code: 1, message: stack});
+      });
+
+    function handleSignal(signal) {
+      handleTermination({code: 1, message: `Received ${signal}`});
+    }
+  }
+
+  function handleTermination({code = 0, message = false}) {
+    logMessage(message);
+
+    process.exit(code); // eslint-disable-line no-process-exit
+
+    function logMessage(message) {
+      if (message) {
+        return logger.error(message);
+      }
+    }
+  }
+}

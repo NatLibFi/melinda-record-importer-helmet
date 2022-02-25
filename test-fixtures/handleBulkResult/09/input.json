@@ -1,0 +1,22 @@
+{
+  "correlationId": "FOO",
+  "cataloger": "xxx0000",
+  "oCatalogerIn": "xxx0000",
+  "operation": "CREATE",
+  "queueItemState": "DONE",
+  "handledRecords": [
+    {
+      "status": "CREATED",
+      "melindaId": "001234567",
+      "title": "example",
+      "standardIdentifiers": [
+        "978-952-373-345-9"
+      ],
+      "sourceId": "(MALLI)0239734",
+      "blobf001": "000000001"
+    }
+  ],
+  "rejectedRecords": [],
+  "errorStatus": "",
+  "errorMessage": ""
+}
