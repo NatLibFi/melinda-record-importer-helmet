@@ -29,7 +29,7 @@
 import {readEnvironmentVariable} from '@natlibfi/melinda-backend-commons';
 import {parseBoolean} from '@natlibfi/melinda-commons';
 
-export const profileId = readEnvironmentVariable('PROFILE_ID');
+export const profileIds = readEnvironmentVariable('PROFILE_IDS', {format: v => JSON.parse(v)});
 export const amqpUrl = readEnvironmentVariable('AMQP_URL');
 export const importOfflinePeriod = readEnvironmentVariable('IMPORT_OFFLINE_PERIOD');
 

@@ -15,13 +15,13 @@ export async function startApp(config, riApiClient, melindaApiClient, amqplib, w
   }
 
   // Check if blobs
-  const processingBlobId = await getNextBlobId(riApiClient, {profileId: config.profileId, state: BLOB_STATE.PROCESSING_BULK, importOfflinePeriod: config.importOfflinePeriod});
+  const processingBlobId = await getNextBlobId(riApiClient, {profileIds: config.profileIds, state: BLOB_STATE.PROCESSING_BULK, importOfflinePeriod: config.importOfflinePeriod});
   if (!processingBlobId) {
-    debug(`No blobs in ${BLOB_STATE.PROCESSING_BULK} found for ${config.profileId}`);
-    const transformedBlobId = await getNextBlobId(riApiClient, {profileId: config.profileId, state: BLOB_STATE.TRANSFORMED});
+    debug(`No blobs in ${BLOB_STATE.PROCESSING_BULK} found for ${config.profileIds}`);
+    const transformedBlobId = await getNextBlobId(riApiClient, {profileId: config.profileIds, state: BLOB_STATE.TRANSFORMED});
 
     if (!transformedBlobId) {
-      debug(`No blobs in ${BLOB_STATE.TRANSFORMED} found for ${config.profileId}`);
+      debug(`No blobs in ${BLOB_STATE.TRANSFORMED} found for ${config.profileIds}`);
       return startApp(config, riApiClient, melindaApiClient, true);
     }
 
