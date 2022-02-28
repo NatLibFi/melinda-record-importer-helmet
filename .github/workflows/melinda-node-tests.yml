@@ -31,7 +31,6 @@ jobs:
 
   njsscan:
     name: Njsscan check
-    needs: build-node-versions
     runs-on: ubuntu-latest
 
     steps:
@@ -45,7 +44,7 @@ jobs:
 
   quayio:
     name: Quay.io image builder & publisher
-    needs: njsscan
+    needs: [build-node-versions, njsscan]
     runs-on: ubuntu-latest
 
     steps:
