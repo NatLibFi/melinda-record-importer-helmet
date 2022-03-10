@@ -1,7 +1,7 @@
 import {READERS} from '@natlibfi/fixura';
 import amqplib from '@onify/fake-amqplib';
 import generateTests from '@natlibfi/fixugen-http-client';
-import handleTransformedBlob from './handleTransformedBlob';
+import transformedBlobHandlerFactory from './handleTransformedBlob';
 import createDebugLogger from 'debug';
 import {createApiClient as createRecordImportApiClient} from '@natlibfi/melinda-record-import-commons';
 import {createApiClient as createMelindaApiClient} from '@natlibfi/melinda-rest-api-client';
@@ -34,7 +34,7 @@ async function callback({enabled = true, configs}) {
     debug('TEST SKIPPED!');
     return;
   }
-
-  await handleTransformedBlob(riApiClient, melindaApiClient, amqplib, configs);
+  const transformedBlobHandler = transformedBlobHandlerFactory(riApiClient, melindaApiClient, amqplib, configs);
+  await transformedBlobHandler.startHandling(configs.blobId);
   return;
 }

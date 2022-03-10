@@ -2,39 +2,71 @@ import {getNextBlobId, BLOB_STATE} from '@natlibfi/melinda-record-import-commons
 import {promisify} from 'util';
 import {pollMelindaRestApi} from '@natlibfi/melinda-rest-api-client';
 import {handleBulkResult} from './handleBulkResult';
-import handleTransformedBlob from './handleTransformedBlob';
 import createDebugLogger from 'debug';
 
 const setTimeoutPromise = promisify(setTimeout);
 const debug = createDebugLogger('@natlibfi/melinda-import-importer:startApp');
 
-export async function startApp(config, riApiClient, melindaApiClient, amqplib, wait) {
-  if (wait) {
-    await setTimeoutPromise(3000);
-    return startApp(config, riApiClient, melindaApiClient);
-  }
+export async function startApp(config, riApiClient, melindaApiClient, transformedBlobHandler) {
+  await logic();
 
-  // Check if blobs
-  const processingBlobId = await getNextBlobId(riApiClient, {profileIds: config.profileIds, state: BLOB_STATE.PROCESSING_BULK, importOfflinePeriod: config.importOfflinePeriod});
-  if (!processingBlobId) {
-    debug(`No blobs in ${BLOB_STATE.PROCESSING_BULK} found for ${config.profileIds}`);
-    const transformedBlobId = await getNextBlobId(riApiClient, {profileId: config.profileIds, state: BLOB_STATE.TRANSFORMED});
-
-    if (!transformedBlobId) {
-      debug(`No blobs in ${BLOB_STATE.TRANSFORMED} found for ${config.profileIds}`);
-      return startApp(config, riApiClient, melindaApiClient, true);
+  async function logic(wait = false) {
+    if (wait) {
+      await setTimeoutPromise(3000);
+      return logic();
     }
 
-    // Handle blob to bulk
-    debug(`Handling ${BLOB_STATE.TRANSFORMED} blob ${transformedBlobId}`);
-    await handleTransformedBlob(riApiClient, melindaApiClient, amqplib, {blobId: transformedBlobId, ...config});
-    return startApp(config, riApiClient, melindaApiClient);
+    const {profileIds} = config;
+
+    // Check if blobs
+    debug(`Trying to find blobs for ${profileIds}`); // eslint-disable-line
+    const processingBlobInfo = await getNextBlobId(riApiClient, {profileIds, state: BLOB_STATE.PROCESSING_BULK, importOfflinePeriod: config.importOfflinePeriod});
+    if (!processingBlobInfo.blobId) {
+      debug(`No blobs in ${BLOB_STATE.PROCESSING_BULK} found for ${profileIds}`);
+      const transformedBlobInfo = await getNextBlobId(riApiClient, {profileIds, state: BLOB_STATE.TRANSFORMED});
+
+      if (!transformedBlobInfo.blobId) {
+        debug(`No blobs in ${BLOB_STATE.TRANSFORMED} found for ${profileIds}`);
+        return logic(true);
+      }
+
+      // Handle blob to bulk
+      debug(`Handling ${BLOB_STATE.TRANSFORMED} blob ${transformedBlobInfo.blobId}`);
+      await transformedBlobHandler.startHandling(transformedBlobInfo.blobId);
+      return logic();
+    }
+
+    // Poll bulk
+    debug(`Handling ${BLOB_STATE.PROCESSING_BULK} blob ${processingBlobInfo.blobId}, correlationId: ${processingBlobInfo.correlationId}`);
+    // get blob info from record-import-api
+    const importResults = await pollResultHandling(melindaApiClient, rocessingBlobInfo.blobId, processingBlobInfo.correlationId);
+    await handleBulkResult(riApiClient, processingBlobInfo.blobId, importResults);
+    // Handle result
+    return logic();
   }
 
-  // Poll bulk
-  debug(`Handling ${BLOB_STATE.PROCESSING_BULK} blob ${processingBlobId}`);
-  const importResults = await pollMelindaRestApi(melindaApiClient, processingBlobId);
-  await handleBulkResult(riApiClient, processingBlobId, importResults);
-  // Handle result
-  return startApp(config, riApiClient, melindaApiClient);
+  async function pollResultHandling(melindaApiClient, recordImportBlobId, melindaRestApiCorrelationId) {
+    const metadata = await riApiClient.getBlobMetadata({id: recordImportBlobId});
+
+    if (metadata.state === RECORD_IMPORT_STATE.ABORTED) {
+      debug('Blob state is set to ABORTED. Stopping rest api');
+      await melindaApiClient.setBulkStatus(melindaRestApiCorrelationId, 'ABORT');
+
+      return logic();
+    }
+
+    const pollResults = await pollMelindaRestApi(melindaApiClient, melindaRestApiCorrelationId, true);
+    const finalQueueItemStates = ['DONE', 'ERROR', 'ABORT'];
+
+    if (finalQueueItemStates.includes(pollResults.queueItemState)) {
+      debug(`Melinda rest api item has made to final state ${pollResults.queueItemState}`);
+
+      return pollResults;
+    }
+
+    debug(`Current Melinda rest api item status: ${pollResults.queueItemState}, handled succesfully: ${pollMelindaRestApi.handledIds.length}, rejected: ${pollMelindaRestApi.rejectedIds.length}`);
+    await setTimeoutPromise(1000);
+
+    return pollResultHandling(melindaApiClient, recordImportBlobId, melindaRestApiCorrelationId);
+  }
 }

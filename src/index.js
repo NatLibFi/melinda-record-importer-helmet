@@ -28,9 +28,10 @@
 
 import {handleInterrupt, createLogger} from '@natlibfi/melinda-backend-commons';
 import * as config from './config';
-import startApp from './app';
+import {startApp} from './app';
 import {createApiClient as createRecordImportApiClient} from '@natlibfi/melinda-record-import-commons';
 import {createApiClient as createMelindaApiClient} from '@natlibfi/melinda-rest-api-client';
+import transformedBlobHandlerFactory from './handleTransformedBlob';
 import amqplib from 'amqplib';
 
 const logger = createLogger();
@@ -41,8 +42,9 @@ async function run() {
 
   const riApiClient = createRecordImportApiClient(config.recordImportApiOptions);
   const melindaApiClient = createMelindaApiClient(config.melindaApiOptions);
+  const transformedBlobHandler = transformedBlobHandlerFactory(riApiClient, melindaApiClient, amqplib, config);
 
-  await startApp(config, riApiClient, melindaApiClient, amqplib);
+  await startApp(config, riApiClient, melindaApiClient, transformedBlobHandler);
 
   function registerInterruptionHandlers() {
     process

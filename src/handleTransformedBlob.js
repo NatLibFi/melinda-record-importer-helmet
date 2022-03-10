@@ -5,12 +5,12 @@ import {closeAmqpResources, RECORD_IMPORT_STATE, BLOB_STATE} from '@natlibfi/mel
 import createDebugLogger from 'debug';
 
 
-export default function (riApiClient, melindaApiClient, amqplib, {blobId, amqpUrl, noopProcessing, noopMelindaImport}) {
+export default function (riApiClient, melindaApiClient, amqplib, {amqpUrl, noopProcessing, noopMelindaImport}) {
   const debug = createDebugLogger('@natlibfi/melinda-import-importer:handleTransformedBlob');
 
-  return startHandling();
+  return {startHandling};
 
-  async function startHandling() {
+  async function startHandling(blobId) {
     let connection; // eslint-disable-line functional/no-let
     let channel; // eslint-disable-line functional/no-let
 
@@ -18,10 +18,10 @@ export default function (riApiClient, melindaApiClient, amqplib, {blobId, amqpUr
     channel = await connection.createChannel(); // eslint-disable-line prefer-const
     debug('Amqp connected!');
 
-    const [{correlationId, queueItemState}] = await getAndSetCorrelationId(blobId);
+    const {correlationId, queueItemState} = await getAndSetCorrelationId(blobId);
 
     try {
-      if (queueItemState === 'UPLOADING') {
+      if (queueItemState === 'WAITING_FOR_RECORDS') {
         const {messageCount} = await channel.assertQueue(blobId, {durable: true});
         debug(`Starting consuming records of blob ${blobId}, Sending ${messageCount} records to ${correlationId} bulk queue.`);
 
@@ -30,7 +30,7 @@ export default function (riApiClient, melindaApiClient, amqplib, {blobId, amqpUr
         debug('Queued all messages.');
 
         await closeAmqpResources({connection, channel});
-        await melindaApiClient.setBulkStatus(correlationId, 'PENDING_QUEUING');
+        await melindaApiClient.setBulkStatus(correlationId, 'PENDING_VALIDATION');
         return riApiClient.updateState({id: blobId, state: BLOB_STATE.PROCESSING_BULK});
       }
 
@@ -41,7 +41,6 @@ export default function (riApiClient, melindaApiClient, amqplib, {blobId, amqpUr
       throw new Error(error);
     }
 
-
     async function getAndSetCorrelationId(id) {
       const {correlationId} = await riApiClient.getBlobMetadata({id});
 
@@ -51,7 +50,7 @@ export default function (riApiClient, melindaApiClient, amqplib, {blobId, amqpUr
 
       debug('Creating new bulk item to Melinda rest api');
       // Create bulk to melinda rest api
-      const response = await melindaApiClient.creteBulkNoStream('application/json', {unique: 1, noop: noopMelindaImport});
+      const response = await melindaApiClient.creteBulkNoStream('application/json', {unique: 1, noop: noopMelindaImport, pOldNew: 'NEW', pActiveLibrary: 'FIN01'});
       debug(`Bulk response: ${JSON.stringify(response)}`);
       // setCorrelationId to blob in record import rest api
       await riApiClient.setCorrelationId({id, correlationId: response.correlationId});
@@ -62,7 +61,7 @@ export default function (riApiClient, melindaApiClient, amqplib, {blobId, amqpUr
       const message = await channel.get(blobId);
 
       if (message) {
-        debug(`Message received: ${message}`);
+        debug(`Message received`);
 
         const metadata = await riApiClient.getBlobMetadata({id: blobId});
 
@@ -73,14 +72,14 @@ export default function (riApiClient, melindaApiClient, amqplib, {blobId, amqpUr
         }
 
         try {
-          const importResult = await handleMessage(message, correlationId);
-          debug(`Import result: ${JSON.stringify(importResult)}`);
-          if (importResult.status === RECORD_IMPORT_STATE.ERROR) {
+          const {status, metadata} = await handleMessage(message, correlationId);
+          debug(`Import result: ${JSON.stringify(status)}`);
+          if (status === RECORD_IMPORT_STATE.ERROR) {
             await channel.nack(message);
             return consume(correlationId);
           }
 
-          await riApiClient.setRecordQueued({id: blobId, ...importResult});
+          await riApiClient.setRecordQueued({id: blobId, ...metadata});
           await channel.ack(message);
           return consume(correlationId);
         } catch (err) {
@@ -96,7 +95,7 @@ export default function (riApiClient, melindaApiClient, amqplib, {blobId, amqpUr
       const standardIdentifiers = await getRecordStandardIdentifiers(record);
       debug(`Record data to be imported: Title: ${title}, identifiers: ${standardIdentifiers} to Bulk ${correlationId}`);
       const recordObject = record.toObject();
-      debug(JSON.stringify(recordObject));
+      // debug(JSON.stringify(recordObject));
 
       if (noopProcessing) {
         debug('NOOP set. Not importing anything');
