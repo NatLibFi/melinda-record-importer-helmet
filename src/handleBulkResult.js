@@ -23,7 +23,7 @@
 import {BLOB_STATE} from '@natlibfi/melinda-record-import-commons';
 import createDebugLogger from 'debug';
 
-const debug = createDebugLogger('@natlibfi/melinda-import-importer:handleBulkResults');
+const debug = createDebugLogger('@natlibfi/melinda-record-import-importer:handleBulkResults');
 
 export async function handleBulkResult(riApiClient, blobId, bulkImportResults) {
   debug('handleBulkresult Begun');

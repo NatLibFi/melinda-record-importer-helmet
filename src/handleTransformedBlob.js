@@ -6,7 +6,7 @@ import createDebugLogger from 'debug';
 
 
 export default function (riApiClient, melindaApiClient, amqplib, {amqpUrl, noopProcessing, noopMelindaImport}) {
-  const debug = createDebugLogger('@natlibfi/melinda-import-importer:handleTransformedBlob');
+  const debug = createDebugLogger('@natlibfi/melinda-record-import-importer:handleTransformedBlob');
 
   return {startHandling};
 
@@ -73,7 +73,7 @@ export default function (riApiClient, melindaApiClient, amqplib, {amqpUrl, noopP
 
         try {
           const {status, metadata} = await handleMessage(message, correlationId);
-          debug(`Import result: ${JSON.stringify(status)}`);
+          debug(`Queuing result: ${JSON.stringify(status)}`);
           if (status === RECORD_IMPORT_STATE.ERROR) {
             await channel.nack(message);
             return consume(correlationId);
@@ -93,9 +93,9 @@ export default function (riApiClient, melindaApiClient, amqplib, {amqpUrl, noopP
       const record = new MarcRecord(JSON.parse(message.content.toString()), {subfieldValues: false});
       const title = await getRecordTitle(record);
       const standardIdentifiers = await getRecordStandardIdentifiers(record);
-      debug(`Record data to be imported: Title: ${title}, identifiers: ${standardIdentifiers} to Bulk ${correlationId}`);
+      debug(`Record data to be sent to queue: Title: ${title}, identifiers: ${standardIdentifiers} to Bulk ${correlationId}`);
       const recordObject = record.toObject();
-      // debug(JSON.stringify(recordObject));
+      debug(JSON.stringify(recordObject));
 
       if (noopProcessing) {
         debug('NOOP set. Not importing anything');
@@ -103,9 +103,9 @@ export default function (riApiClient, melindaApiClient, amqplib, {amqpUrl, noopP
       }
 
       try {
-        debug('Importing record to Melinda...');
+        debug('Sending record to Melinda rest api queue...');
         const response = await melindaApiClient.sendRecordToBulk(recordObject, correlationId, 'application/json');
-        debug(`Record sent to bulk ${correlationId}`);
+        debug(`Record sent to queue ${correlationId}`);
 
         if (response) {
           return {status: RECORD_IMPORT_STATE.QUEUED, metadata: {title, standardIdentifiers}};
@@ -114,6 +114,11 @@ export default function (riApiClient, melindaApiClient, amqplib, {amqpUrl, noopP
         return {status: RECORD_IMPORT_STATE.ERROR, metadata: {title, standardIdentifiers}};
       } catch (error) {
         if (error.status) {
+          if (error.status === httpStatus.CONFLICT) {
+            debug('Got expected conflict response (409)');
+            throw error;
+          }
+
           if (error.status === httpStatus.UNPROCESSABLE_ENTITY) {
             debug('Got expected unprosessable entity response');
             return {status: RECORD_IMPORT_STATE.INVALID, metadata: {validationMessages: error.payload, title, standardIdentifiers}};

@@ -5,7 +5,7 @@ import {handleBulkResult} from './handleBulkResult';
 import createDebugLogger from 'debug';
 import {createApiClient} from '@natlibfi/melinda-record-import-commons';
 
-const debug = createDebugLogger('@natlibfi/melinda-import-importer:handleBulkResults:test');
+const debug = createDebugLogger('@natlibfi/melinda-record-import-importer:handleBulkResults:test');
 const client = createApiClient({
   recordImportApiUrl: 'http://foo.bar',
   recordImportApiUsername: 'foo',

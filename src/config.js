@@ -31,7 +31,7 @@ import {parseBoolean} from '@natlibfi/melinda-commons';
 
 export const profileIds = readEnvironmentVariable('PROFILE_IDS', {format: v => JSON.parse(v)});
 export const amqpUrl = readEnvironmentVariable('AMQP_URL');
-export const importOfflinePeriod = readEnvironmentVariable('IMPORT_OFFLINE_PERIOD');
+export const importOfflinePeriod = readEnvironmentVariable('IMPORT_OFFLINE_PERIOD', {defaultValue: '{"startHour":24, "lengthHours":0}'});
 
 export const logLevel = readEnvironmentVariable('LOG_LEVEL', {defaultValue: 'info'});
 export const noopProcessing = readEnvironmentVariable('NOOP_PROCESSING', {defaultValue: false, format: parseBoolean});
@@ -40,8 +40,8 @@ export const uniqueMelindaImport = readEnvironmentVariable('UNIQUE_MELINDA_IMPOR
 
 export const recordImportApiOptions = {
   recordImportApiUrl: readEnvironmentVariable('RECORD_IMPORT_API_URL'),
-  recordImportApiUsername: readEnvironmentVariable('RECORD_IMPORT_API_USERNAME'),
-  recordImportApiPassword: readEnvironmentVariable('RECORD_IMPORT_API_PASSWORD'),
+  recordImportApiUsername: readEnvironmentVariable('RECORD_IMPORT_API_USERNAME_IMPORTER'),
+  recordImportApiPassword: readEnvironmentVariable('RECORD_IMPORT_API_PASSWORD_IMPORTER'),
   userAgent: readEnvironmentVariable('API_CLIENT_USER_AGENT', {defaultValue: '_RECORD-IMPORT-IMPORTER'})
 };
 

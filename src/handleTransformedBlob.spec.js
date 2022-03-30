@@ -6,7 +6,7 @@ import createDebugLogger from 'debug';
 import {createApiClient as createRecordImportApiClient} from '@natlibfi/melinda-record-import-commons';
 import {createApiClient as createMelindaApiClient} from '@natlibfi/melinda-rest-api-client';
 
-const debug = createDebugLogger('@natlibfi/melinda-import-importer:handleTransformedBlob:test');
+const debug = createDebugLogger('@natlibfi/melinda-record-import-importer:handleTransformedBlob:test');
 const riApiClient = createRecordImportApiClient({
   recordImportApiUrl: 'http://foo.bar',
   recordImportApiUsername: 'foo',

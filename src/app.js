@@ -5,7 +5,7 @@ import {handleBulkResult} from './handleBulkResult';
 import createDebugLogger from 'debug';
 
 const setTimeoutPromise = promisify(setTimeout);
-const debug = createDebugLogger('@natlibfi/melinda-import-importer:startApp');
+const debug = createDebugLogger('@natlibfi/melinda-record-import-importer:startApp');
 
 export async function startApp(config, riApiClient, melindaApiClient, transformedBlobHandler) {
   await logic();
@@ -39,24 +39,28 @@ export async function startApp(config, riApiClient, melindaApiClient, transforme
     // Poll bulk
     debug(`Handling ${BLOB_STATE.PROCESSING_BULK} blob ${processingBlobInfo.blobId}, correlationId: ${processingBlobInfo.correlationId}`);
     // get blob info from record-import-api
-    const importResults = await pollResultHandling(melindaApiClient, rocessingBlobInfo.blobId, processingBlobInfo.correlationId);
+    const importResults = await pollResultHandling(melindaApiClient, processingBlobInfo.blobId, processingBlobInfo.correlationId);
     await handleBulkResult(riApiClient, processingBlobInfo.blobId, importResults);
     // Handle result
     return logic();
   }
 
   async function pollResultHandling(melindaApiClient, recordImportBlobId, melindaRestApiCorrelationId) {
+    const finalQueueItemStates = ['DONE', 'ERROR', 'ABORT'];
+    debug('Getting blob metadata');
     const metadata = await riApiClient.getBlobMetadata({id: recordImportBlobId});
+    debug(`Got blob metadata from record import, state: ${metadata.state}`);
 
-    if (metadata.state === RECORD_IMPORT_STATE.ABORTED) {
+    if (metadata.state === BLOB_STATE.ABORTED) {
       debug('Blob state is set to ABORTED. Stopping rest api');
       await melindaApiClient.setBulkStatus(melindaRestApiCorrelationId, 'ABORT');
 
       return logic();
     }
 
-    const pollResults = await pollMelindaRestApi(melindaApiClient, melindaRestApiCorrelationId, true);
-    const finalQueueItemStates = ['DONE', 'ERROR', 'ABORT'];
+    const poller = pollMelindaRestApi(melindaApiClient, melindaRestApiCorrelationId, true);
+    const pollResults = await poller();
+    debug(`Got pollResults ${JSON.stringify(pollResults)}`);
 
     if (finalQueueItemStates.includes(pollResults.queueItemState)) {
       debug(`Melinda rest api item has made to final state ${pollResults.queueItemState}`);
