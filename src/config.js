@@ -30,6 +30,7 @@ import {readEnvironmentVariable} from '@natlibfi/melinda-backend-commons';
 import {parseBoolean} from '@natlibfi/melinda-commons';
 
 export const profileIds = readEnvironmentVariable('PROFILE_IDS', {format: v => JSON.parse(v)});
+export const profileToCataloger = readEnvironmentVariable('PROFILE_TO_CATALOGER', {format: v => JSON.parse(v)});
 export const amqpUrl = readEnvironmentVariable('AMQP_URL');
 export const importOfflinePeriod = readEnvironmentVariable('IMPORT_OFFLINE_PERIOD', {defaultValue: '{"startHour":24, "lengthHours":0}'});
 
@@ -49,5 +50,4 @@ export const melindaApiOptions = {
   melindaApiUrl: readEnvironmentVariable('MELINDA_API_URL', {defaultValue: false}),
   melindaApiUsername: readEnvironmentVariable('MELINDA_API_USERNAME', {defaultValue: ''}),
   melindaApiPassword: readEnvironmentVariable('MELINDA_API_PASSWORD', {defaultValue: ''}),
-  cataloger: readEnvironmentVariable('CATALOGER_ID', {defaultValue: false})
 };
