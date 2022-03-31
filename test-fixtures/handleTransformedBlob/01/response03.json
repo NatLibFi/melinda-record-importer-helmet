@@ -1,5 +1,5 @@
 {
   "correlationId": "0-0-0",
-  "queueItemState": "UPLOADING",
+  "queueItemState": "WAITING_FOR_RECORDS",
   "modificationTime": "2021-01-01T01:00:11.000Z"
 }

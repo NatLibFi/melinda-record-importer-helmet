@@ -1,8 +1,9 @@
 {
-  "description": "Handle transformed blob - Uploading to pending queuing, no messages",
+  "description": "Handle transformed blob - WAITING_FOR_RECORDS to PENDING_VALIDATION, no messages",
   "configs": {
     "blobId": "000",
     "profileId": "foobar",
+    "profileToCataloger": "{\"foobar\": \"foobar\"}",
     "amqpUrl": "amqp://foo.bar/",
     "importOfflinePeriod": "{\"startHour\":22, \"lengthHours\":9}",
     "logLevel": "info",
@@ -31,7 +32,7 @@
     },
     {
       "method": "put",
-      "url": "/bulk/state/0-0-0?status=PENDING_QUEUING",
+      "url": "/bulk/state/0-0-0?status=PENDING_VALIDATION",
       "status": 200
     },
     {

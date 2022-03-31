@@ -3,6 +3,7 @@
   "configs": {
     "blobId": "000",
     "profileId": "foobar",
+    "profileToCataloger": "{\"foobar\": \"foobar\"}",
     "amqpUrl": "amqp://foo.bar/",
     "importOfflinePeriod": "{\"startHour\":22, \"lengthHours\":9}",
     "logLevel": "info",
