@@ -60,7 +60,7 @@ export default function (riApiClient, melindaApiClient, amqplib, config) {
         pOldNew: 'NEW',
         pActiveLibrary: 'FIN01',
         pCatalogerIn
-      }
+      };
       const response = await melindaApiClient.creteBulkNoStream('application/json', bulkConf);
       debug(`Bulk response: ${JSON.stringify(response)}`);
       // setCorrelationId to blob in record import rest api
