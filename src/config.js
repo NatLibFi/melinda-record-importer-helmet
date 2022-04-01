@@ -38,6 +38,7 @@ export const logLevel = readEnvironmentVariable('LOG_LEVEL', {defaultValue: 'inf
 export const noopProcessing = readEnvironmentVariable('NOOP_PROCESSING', {defaultValue: false, format: parseBoolean});
 export const noopMelindaImport = readEnvironmentVariable('NOOP_MELINDA_IMPORT', {defaultValue: '0'});
 export const uniqueMelindaImport = readEnvironmentVariable('UNIQUE_MELINDA_IMPORT', {defaultValue: '1'});
+export const mergeMelindaImport = readEnvironmentVariable('MERGE_MELINDA_IMPORT', {defaultValue: '0'});
 
 export const recordImportApiOptions = {
   recordImportApiUrl: readEnvironmentVariable('RECORD_IMPORT_API_URL'),

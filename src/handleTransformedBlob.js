@@ -7,7 +7,7 @@ import createDebugLogger from 'debug';
 
 export default function (riApiClient, melindaApiClient, amqplib, config) {
   const debug = createDebugLogger('@natlibfi/melinda-record-import-importer:handleTransformedBlob');
-  const {amqpUrl, noopProcessing, noopMelindaImport, profileToCataloger, uniqueMelindaImport} = config;
+  const {amqpUrl, noopProcessing, noopMelindaImport, profileToCataloger, uniqueMelindaImport, mergeMelindaImport} = config;
   return {startHandling};
 
   async function startHandling(blobId) {
@@ -53,7 +53,15 @@ export default function (riApiClient, melindaApiClient, amqplib, config) {
       debug('Creating new bulk item to Melinda rest api');
       debug(`Options: unique: ${uniqueMelindaImport}, noop: ${noopMelindaImport}, cataloger: ${pCatalogerIn}`);
       // Create bulk to melinda rest api
-      const response = await melindaApiClient.creteBulkNoStream('application/json', {unique: uniqueMelindaImport, noop: noopMelindaImport, pOldNew: 'NEW', pActiveLibrary: 'FIN01', pCatalogerIn});
+      const bulkConf = {
+        unique: uniqueMelindaImport,
+        noop: noopMelindaImport,
+        merge: mergeMelindaImport,
+        pOldNew: 'NEW',
+        pActiveLibrary: 'FIN01',
+        pCatalogerIn
+      }
+      const response = await melindaApiClient.creteBulkNoStream('application/json', bulkConf);
       debug(`Bulk response: ${JSON.stringify(response)}`);
       // setCorrelationId to blob in record import rest api
       await riApiClient.setCorrelationId({id, correlationId: response.correlationId});
