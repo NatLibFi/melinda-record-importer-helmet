@@ -4,19 +4,21 @@
   "oCatalogerIn": "xxx0000",
   "operation": "CREATE",
   "queueItemState": "DONE",
-  "handledRecords": [
+  "records": [
     {
       "status": "UPDATED",
       "melindaId": "001234567",
-      "title": "example",
-      "standardIdentifiers": [
-        "978-952-373-345-9"
-      ],
-      "sourceId": "(MALLI)0239734",
-      "blobf001": "001234567"
+      "message": "",
+      "recordMetadata": {
+        "blobSequence": "1",
+        "standardIdentifiers": [
+          "978-952-373-345-9"
+        ],
+        "sourceId": "(MALLI)0239734",
+        "title": "example"
+      }
     }
   ],
-  "rejectedRecords": [],
   "errorStatus": "",
   "errorMessage": ""
 }

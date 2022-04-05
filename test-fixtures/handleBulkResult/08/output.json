@@ -1,8 +1,7 @@
 [
   {
     "metadata": {
-      "dublicateIds": ["001234567"],
-      "id": "",
+      "id": "001234567",
       "message": "",
       "sourceId": "(MALLI)0239734",
       "standardIdentifiers": [
@@ -10,6 +9,9 @@
       ],
       "title": "example"
     },
+    "dublicateIds": [
+      "001234567"
+    ],
     "status": "DUPLICATE"
   }
 ]

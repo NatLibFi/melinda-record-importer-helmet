@@ -1,9 +1,8 @@
 [
   {
     "metadata": {
-      "dublicateIds": [],
       "id": "001234567",
-      "message": "CAT-missmatch",
+      "message": "Modification history mismatch (CAT)",
       "sourceId": "(MALLI)0239734",
       "standardIdentifiers": [
         "978-952-373-345-9"
