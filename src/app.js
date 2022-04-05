@@ -68,7 +68,7 @@ export async function startApp(config, riApiClient, melindaApiClient, transforme
       return pollResults;
     }
 
-    debug(`Current Melinda rest api item status: ${pollResults.queueItemState}, handled succesfully: ${pollMelindaRestApi.handledIds.length}, rejected: ${pollMelindaRestApi.rejectedIds.length}`);
+    debug(`Current Melinda rest api item status: ${pollResults.queueItemState}, records: ${pollMelindaRestApi.records.length}`);
     await setTimeoutPromise(1000);
 
     return pollResultHandling(melindaApiClient, recordImportBlobId, melindaRestApiCorrelationId);
