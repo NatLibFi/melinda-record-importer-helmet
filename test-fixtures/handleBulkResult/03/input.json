@@ -7,14 +7,14 @@
   "records": [
     {
       "status": "CONFLICT",
-      "melindaId": "001234567",
+      "databaseId": "001234567",
       "message": "Modification history mismatch (CAT)",
       "recordMetadata": {
         "blobSequence": "1",
         "standardIdentifiers": [
           "978-952-373-345-9"
         ],
-        "sourceId": "(MALLI)0239734",
+        "sourceIds": ["(MALLI)0239734"],
         "title": "example"
       }
     }

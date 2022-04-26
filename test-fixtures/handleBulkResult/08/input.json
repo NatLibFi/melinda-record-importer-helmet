@@ -7,7 +7,7 @@
   "records": [
     {
       "status": "DUPLICATE",
-      "melindaId": "001234567",
+      "databaseId": "001234567",
       "message": "",
       "dublicateIds": [
         "001234567"
@@ -17,7 +17,7 @@
         "standardIdentifiers": [
           "978-952-373-345-9"
         ],
-        "sourceId": "(MALLI)0239734",
+        "sourceIds": ["(MALLI)0239734"],
         "title": "example"
       }
     }
