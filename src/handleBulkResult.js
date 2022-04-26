@@ -1,43 +1,31 @@
 // {
-//   "correlationId": "a109ab03-3645-4916-b5c6-4b80c7148c04",
+//   "correlationId": "e348c2b2-c34f-4b60-93bf-c82b4c4a944f",
 //   "cataloger": "LOAD_IMP",
 //   "oCatalogerIn": "LOAD-IMP",
 //   "operation": "CREATE",
-//   "operations": [
-//     "CREATE"
-//   ],
-//   "operationSettings": {
-//     "prio": false,
-//     "noStream": true,
-//     "noop": true,
-//     "unique": true,
-//     "merge": true,
-//     "validate": true,
-//     "failOnError": false
-//   },
 //   "contentType": "application/json",
-//   "queueItemState": "DONE",
-//   "importJobState": {
-//     "CREATE": "EMPTY",
-//     "UPDATE": "EMPTY"
-//   },
-//   "creationTime": "2022-04-04T14:03:24.841Z",
-//   "modificationTime": "2022-04-04T14:04:02.314Z",
-//   "records": [
+//   "queueItemState": "VALIDATING",
+//   "blobSize": 963,
+//   "records":
+//   [
 //     {
-//       "melindaId": "000000000",
-//       "recordMetadata": {
-//         "sourceId": "(FI-MELINDA)000999998",
+//       "databaseId": "017554291",
+//       "recordMetadata":
+//       {
+//         "sourceIds": ["(helme)2429377"],
 //         "blobSequence": 1,
-//         "title": "Punokset puikoille",
-//         "standardIdentifiers": [
-//           "978-951-692-678-3",
-//           "A1258209"
-//         ]
+//         "title": "Pitkä tie kotiin",
+//         "standardIdentifiers": ["978-952-279-080-4"]
 //       },
-//       "status": "CONFLICT",
-//       "message": "Modification history mismatch (CAT)"
-//     },
+//       "status": "UPDATED",
+//       "message": "Merged to 017554291 preferring database record. - Would update record 017554291. - Noop."
+//     }
+//   ],
+//   "errorMessage": "",
+//   "errorStatus": "",
+//   "creationTime": "2022-04-26T10:51:28.271Z",
+//   "modificationTime": "2022-04-26T10:56:48.186Z"
+// }
 
 import {BLOB_STATE} from '@natlibfi/melinda-record-import-commons';
 import createDebugLogger from 'debug';
@@ -82,14 +70,14 @@ export async function handleBulkResult(riApiClient, blobId, bulkImportResults) {
   }
 
   function recordDataBuilder(record) {
-    const {status, message, dublicateIds, melindaId, recordMetadata = {}} = record;
-    const {sourceId, title, standardIdentifiers} = recordMetadata;
+    const {status, message, dublicateIds, databaseId, recordMetadata = {}} = record;
+    const {sourceIds, title, standardIdentifiers} = recordMetadata;
 
     const metadata = {
-      id: melindaId,
+      id: databaseId,
       title,
       standardIdentifiers,
-      sourceId,
+      sourceIds,
       message
     };
 
