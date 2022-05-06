@@ -18,14 +18,14 @@ export default function (riApiClient, melindaApiClient, amqplib, config) {
     channel = await connection.createChannel(); // eslint-disable-line prefer-const
     debug('Amqp connected!');
 
-    const {correlationId, queueItemState} = await getAndSetCorrelationId(blobId);
+    const {correlationId, queueItemState} = await getAndSetCorrelationId(blobId, noopProcessing);
 
     try {
       if (queueItemState === 'WAITING_FOR_RECORDS') {
         const {messageCount} = await channel.assertQueue(blobId, {durable: true});
         debug(`Starting consuming records of blob ${blobId}, Sending ${messageCount} records to ${correlationId} bulk queue.`);
 
-        await consume(correlationId);
+        await consume(blobId, correlationId);
 
         debug('Queued all messages.');
 
@@ -41,7 +41,14 @@ export default function (riApiClient, melindaApiClient, amqplib, config) {
       throw new Error(error);
     }
 
-    async function getAndSetCorrelationId(id) {
+    async function getAndSetCorrelationId(id, noopProcessing) {
+      if (noopProcessing) {
+        const correlationId = 'noop';
+        const queueItemState = 'WAITING_FOR_RECORDS';
+        await riApiClient.setCorrelationId({id, correlationId});
+        return {correlationId, queueItemState};
+      }
+
       const {correlationId, profile} = await riApiClient.getBlobMetadata({id});
       // Add pCatalogerIn based on blobs profile
       const pCatalogerIn = profileToCataloger[profile] || 'LOAD_IMP';
@@ -68,39 +75,33 @@ export default function (riApiClient, melindaApiClient, amqplib, config) {
       return response;
     }
 
-    async function consume(correlationId) {
+    async function consume(blobId, correlationId) {
       const message = await channel.get(blobId);
-
-      if (message) {
-        debug(`Message received`);
-
-        const metadata = await riApiClient.getBlobMetadata({id: blobId});
-
-        if (metadata.state === RECORD_IMPORT_STATE.ABORTED) {
-          debug('Blob state is set to ABORTED. Ditching message');
-          await channel.nack(message, false, false);
-          return consume(correlationId);
-        }
-
+      if (message) { // eslint-disable-line
         try {
-          const {status, metadata} = await handleMessage(message, correlationId);
+          const {state} = await riApiClient.getBlobMetadata({id: blobId});
+          const aborted = state === RECORD_IMPORT_STATE.ABORTED;
+          debug(`Message received`);
+          const {status, metadata} = await handleMessage(message, correlationId, aborted);
           debug(`Queuing result: ${JSON.stringify(status)}`);
           if (status === RECORD_IMPORT_STATE.ERROR) {
             await channel.nack(message);
-            return consume(correlationId);
+            return consume(blobId, correlationId);
           }
 
           await riApiClient.setRecordQueued({id: blobId, ...metadata});
           await channel.ack(message);
-          return consume(correlationId);
+          return consume(blobId, correlationId);
         } catch (err) {
           await channel.nack(message);
           throw err;
         }
       }
+
+      return;
     }
 
-    async function handleMessage(message, correlationId) {
+    async function handleMessage(message, correlationId, aborted) {
       const record = new MarcRecord(JSON.parse(message.content.toString()), {subfieldValues: false});
       const title = await getRecordTitle(record);
       const standardIdentifiers = await getRecordStandardIdentifiers(record);
@@ -108,8 +109,8 @@ export default function (riApiClient, melindaApiClient, amqplib, config) {
       const recordObject = record.toObject();
       debug(JSON.stringify(recordObject));
 
-      if (noopProcessing) {
-        debug('NOOP set. Not importing anything');
+      if (noopProcessing || aborted) {
+        debug(`${aborted ? 'Blob has been aborted skipping!' : 'NOOP set. Not importing anything'}`);
         return {status: RECORD_IMPORT_STATE.SKIPPED, metadata: {title, standardIdentifiers}};
       }
 
@@ -125,10 +126,6 @@ export default function (riApiClient, melindaApiClient, amqplib, config) {
         return {status: RECORD_IMPORT_STATE.ERROR, metadata: {title, standardIdentifiers}};
       } catch (error) {
         if (error.status) {
-          if (error.status === httpStatus.CONFLICT) {
-            debug('Got expected conflict response (409)');
-            throw error;
-          }
 
           if (error.status === httpStatus.UNPROCESSABLE_ENTITY) {
             debug('Got expected unprosessable entity response');

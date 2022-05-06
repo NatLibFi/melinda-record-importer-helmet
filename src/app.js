@@ -16,33 +16,46 @@ export async function startApp(config, riApiClient, melindaApiClient, transforme
       return logic();
     }
 
-    const {profileIds} = config;
+    const {profileIds, importOfflinePeriod} = config;
 
     // Check if blobs
     debug(`Trying to find blobs for ${profileIds}`); // eslint-disable-line
-    const processingBlobInfo = await getNextBlobId(riApiClient, {profileIds, state: BLOB_STATE.PROCESSING_BULK, importOfflinePeriod: config.importOfflinePeriod});
-    if (!processingBlobInfo.blobId) {
-      debug(`No blobs in ${BLOB_STATE.PROCESSING_BULK} found for ${profileIds}`);
-      const transformedBlobInfo = await getNextBlobId(riApiClient, {profileIds, state: BLOB_STATE.TRANSFORMED});
-
-      if (!transformedBlobInfo.blobId) {
-        debug(`No blobs in ${BLOB_STATE.TRANSFORMED} found for ${profileIds}`);
-        return logic(true);
-      }
-
-      // Handle blob to bulk
-      debug(`Handling ${BLOB_STATE.TRANSFORMED} blob ${transformedBlobInfo.blobId}`);
-      await transformedBlobHandler.startHandling(transformedBlobInfo.blobId);
+    const processingBulkInfo = await processBlobState(profileIds, BLOB_STATE.PROCESSING_BULK, importOfflinePeriod);
+    if (processingBulkInfo) {
+      const {correlationId, blobId} = processingBulkInfo;
+      debug(`Handling ${BLOB_STATE.PROCESSING_BULK} blob ${blobId}, correlationId: ${correlationId}`);
+      const importResults = await pollResultHandling(melindaApiClient, blobId, correlationId);
+      await handleBulkResult(riApiClient, blobId, importResults);
       return logic();
     }
 
-    // Poll bulk
-    debug(`Handling ${BLOB_STATE.PROCESSING_BULK} blob ${processingBlobInfo.blobId}, correlationId: ${processingBlobInfo.correlationId}`);
-    // get blob info from record-import-api
-    const importResults = await pollResultHandling(melindaApiClient, processingBlobInfo.blobId, processingBlobInfo.correlationId);
-    await handleBulkResult(riApiClient, processingBlobInfo.blobId, importResults);
-    // Handle result
-    return logic();
+    const processingQueueBlobInfo = await processBlobState(profileIds, BLOB_STATE.PROCESSING, importOfflinePeriod);
+    if (processingQueueBlobInfo) {
+      const {blobId} = processingQueueBlobInfo;
+      debug(`Queue to bulk blob ${blobId}`);
+      await transformedBlobHandler.startHandling(blobId);
+      return logic();
+    }
+
+    const transformedBlobInfo = await processBlobState(profileIds, BLOB_STATE.TRANSFORMED, importOfflinePeriod);
+    if (transformedBlobInfo) {
+      const {blobId} = transformedBlobInfo;
+      debug(`Start handling blob ${blobId}`);
+      await riApiClient.updateState({id: blobId, state: BLOB_STATE.PROCESSING});
+      return logic();
+    }
+
+    return logic(true);
+
+    async function processBlobState(profileIds, state, importOfflinePeriod) {
+      const blobInfo = await getNextBlobId(riApiClient, {profileIds, state, importOfflinePeriod});
+      if (blobInfo) {
+        return blobInfo;
+      }
+
+      debug(`No blobs in ${state} found for ${profileIds}`);
+      return false;
+    }
   }
 
   async function pollResultHandling(melindaApiClient, recordImportBlobId, melindaRestApiCorrelationId) {

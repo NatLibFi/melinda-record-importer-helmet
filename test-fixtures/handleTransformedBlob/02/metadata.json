@@ -7,7 +7,7 @@
     "amqpUrl": "amqp://foo.bar/",
     "importOfflinePeriod": "{\"startHour\":22, \"lengthHours\":9}",
     "logLevel": "info",
-    "noopProcessing": true,
+    "noopProcessing": false,
     "noopMelindaImport": "0",
     "uniqueMelindaImport": "1"
   },
