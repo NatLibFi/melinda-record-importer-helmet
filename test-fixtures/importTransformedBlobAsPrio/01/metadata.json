@@ -13,6 +13,7 @@
   },
   "requests": [
     {
+      "step": "Auth user",
       "method": "post",
       "url": "/auth",
       "status": 204,
@@ -21,6 +22,7 @@
       }
     },
     {
+      "step": "post blob state update PROCESSED",
       "method": "post",
       "url": "/blobs/000",
       "status": 204
