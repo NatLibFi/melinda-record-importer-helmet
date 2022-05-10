@@ -13,6 +13,8 @@
   },
   "requests": [
     {
+      "step": "Auth user",
+      "response": "01",
       "method": "post",
       "url": "/auth",
       "status": 204,
@@ -21,21 +23,29 @@
       }
     },
     {
+      "step": "get blob metadata for correlation id",
+      "response": "02",
       "method": "get",
       "url": "/blobs/000",
       "status": 200
     },
     {
+      "step": "get bulk state with correlation id",
+      "response": "03",
       "method": "get",
       "url": "/bulk/state/000",
       "status": 200
     },
     {
+      "step": "put bulk state PENDING_VALIDATION",
+      "response": "04",
       "method": "put",
       "url": "/bulk/state/0-0-0?status=PENDING_VALIDATION",
       "status": 200
     },
     {
+      "step": "post blob state update PROCESSING_BULK",
+      "response": "04",
       "method": "post",
       "url": "/blobs/000",
       "status": 204

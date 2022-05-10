@@ -6,7 +6,7 @@ import createDebugLogger from 'debug';
 
 
 export default function (riApiClient, melindaApiClient, amqplib, config) {
-  const debug = createDebugLogger('@natlibfi/melinda-record-import-importer:handleTransformedBlob');
+  const debug = createDebugLogger('@natlibfi/melinda-record-import-importer:importTransformedBlobAsBulk');
   const {amqpUrl, noopProcessing, noopMelindaImport, profileToCataloger, uniqueMelindaImport, mergeMelindaImport} = config;
   return {startHandling};
 
@@ -43,6 +43,7 @@ export default function (riApiClient, melindaApiClient, amqplib, config) {
 
     async function getAndSetCorrelationId(id, noopProcessing) {
       if (noopProcessing) {
+        debug('Noop response for correlation id');
         const correlationId = 'noop';
         const queueItemState = 'WAITING_FOR_RECORDS';
         await riApiClient.setCorrelationId({id, correlationId});
@@ -61,9 +62,9 @@ export default function (riApiClient, melindaApiClient, amqplib, config) {
       debug(`Options: unique: ${uniqueMelindaImport}, noop: ${noopMelindaImport}, cataloger: ${pCatalogerIn}`);
       // Create bulk to melinda rest api
       const bulkConf = {
-        unique: uniqueMelindaImport,
-        noop: noopMelindaImport,
-        merge: mergeMelindaImport,
+        unique: uniqueMelindaImport ? '1' : '0',
+        noop: noopMelindaImport ? '1' : '0',
+        merge: mergeMelindaImport ? '1' : '0',
         pOldNew: 'NEW',
         pActiveLibrary: 'FIN01',
         pCatalogerIn
@@ -79,9 +80,9 @@ export default function (riApiClient, melindaApiClient, amqplib, config) {
       const message = await channel.get(blobId);
       if (message) { // eslint-disable-line
         try {
+          debug(`Message received`);
           const {state} = await riApiClient.getBlobMetadata({id: blobId});
           const aborted = state === RECORD_IMPORT_STATE.ABORTED;
-          debug(`Message received`);
           const {status, metadata} = await handleMessage(message, correlationId, aborted);
           debug(`Queuing result: ${JSON.stringify(status)}`);
           if (status === RECORD_IMPORT_STATE.ERROR) {

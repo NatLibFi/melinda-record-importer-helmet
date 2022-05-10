@@ -1,5 +1,5 @@
 {
-  "description": "Handle transformed blob - Importing, no messages",
+  "description": "Handle transformed blob - Importing, 2 CREATE messages",
   "configs": {
     "blobId": "000",
     "profileId": "foobar",
@@ -8,8 +8,8 @@
     "importOfflinePeriod": "{\"startHour\":22, \"lengthHours\":9}",
     "logLevel": "info",
     "noopProcessing": false,
-    "noopMelindaImport": "0",
-    "uniqueMelindaImport": "1"
+    "noopMelindaImport": false,
+    "uniqueMelindaImport": true
   },
   "requests": [
     {
@@ -26,14 +26,31 @@
       "status": 200
     },
     {
+      "method": "post",
+      "url": "/?noop=0&unique=1&merge=0&cataloger=LOAD_IMP",
+      "status": 201,
+      "responseHeaders": {"Record-ID": "000000001"}
+    },
+    {
+      "method": "post",
+      "url": "/blobs/000",
+      "status": 204
+    },
+    {
       "method": "get",
-      "url": "/bulk/state/000",
+      "url": "/blobs/000",
       "status": 200
     },
     {
-      "method": "put",
-      "url": "/bulk/state/0-0-0?status=PENDING_QUEUING",
-      "status": 200
+      "method": "post",
+      "url": "/?noop=0&unique=1&merge=0&cataloger=LOAD_IMP",
+      "status": 201,
+      "responseHeaders": {"Record-ID": "000000002"}
+    },
+    {
+      "method": "post",
+      "url": "/blobs/000",
+      "status": 204
     },
     {
       "method": "post",

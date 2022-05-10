@@ -35,10 +35,12 @@ export const amqpUrl = readEnvironmentVariable('AMQP_URL');
 export const importOfflinePeriod = readEnvironmentVariable('IMPORT_OFFLINE_PERIOD', {defaultValue: '{"startHour":24, "lengthHours":0}'});
 
 export const logLevel = readEnvironmentVariable('LOG_LEVEL', {defaultValue: 'info'});
+
 export const noopProcessing = readEnvironmentVariable('NOOP_PROCESSING', {defaultValue: false, format: parseBoolean});
-export const noopMelindaImport = readEnvironmentVariable('NOOP_MELINDA_IMPORT', {defaultValue: '0'});
-export const uniqueMelindaImport = readEnvironmentVariable('UNIQUE_MELINDA_IMPORT', {defaultValue: '1'});
-export const mergeMelindaImport = readEnvironmentVariable('MERGE_MELINDA_IMPORT', {defaultValue: '0'});
+export const noopMelindaImport = readEnvironmentVariable('NOOP_MELINDA_IMPORT', {defaultValue: false, format: parseBoolean});
+export const uniqueMelindaImport = readEnvironmentVariable('UNIQUE_MELINDA_IMPORT', {defaultValue: true, format: parseBoolean});
+export const mergeMelindaImport = readEnvironmentVariable('MERGE_MELINDA_IMPORT', {defaultValue: false, format: parseBoolean});
+export const importAsBulk = readEnvironmentVariable('IMPORT_AS_BULK', {defaultValue: true, format: parseBoolean});
 
 export const recordImportApiOptions = {
   recordImportApiUrl: readEnvironmentVariable('RECORD_IMPORT_API_URL'),

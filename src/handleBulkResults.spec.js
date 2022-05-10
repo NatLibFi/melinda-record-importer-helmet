@@ -30,10 +30,10 @@ async function callback({getFixture, enabled = true}) {
 
   const importResults = getFixture('input.json');
   const expectedResults = getFixture('output.json');
-  debug(importResults);
-  debug(expectedResults);
+  // debug(importResults);
+  // debug(expectedResults);
 
   const handledRecords = await handleBulkResult(client, '000', importResults);
-  debug(handledRecords);
+  // debug(handledRecords);
   expect(handledRecords).to.deep.equal(expectedResults);
 }

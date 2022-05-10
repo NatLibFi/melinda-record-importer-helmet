@@ -7,7 +7,7 @@ import createDebugLogger from 'debug';
 const setTimeoutPromise = promisify(setTimeout);
 const debug = createDebugLogger('@natlibfi/melinda-record-import-importer:startApp');
 
-export async function startApp(config, riApiClient, melindaApiClient, transformedBlobHandler) {
+export async function startApp(config, riApiClient, melindaApiClient, blobImportHandler) {
   await logic();
 
   async function logic(wait = false) {
@@ -16,13 +16,13 @@ export async function startApp(config, riApiClient, melindaApiClient, transforme
       return logic();
     }
 
-    const {profileIds, importOfflinePeriod} = config;
+    const {profileIds, importOfflinePeriod, importAsBulk} = config;
 
     // Check if blobs
     debug(`Trying to find blobs for ${profileIds}`); // eslint-disable-line
-    const processingBulkInfo = await processBlobState(profileIds, BLOB_STATE.PROCESSING_BULK, importOfflinePeriod);
-    if (processingBulkInfo) {
-      const {correlationId, blobId} = processingBulkInfo;
+    const processingInfo = importAsBulk ? await processBlobState(profileIds, BLOB_STATE.PROCESSING_BULK, importOfflinePeriod) : false;
+    if (processingInfo) {
+      const {correlationId, blobId} = processingInfo;
       debug(`Handling ${BLOB_STATE.PROCESSING_BULK} blob ${blobId}, correlationId: ${correlationId}`);
       const importResults = await pollResultHandling(melindaApiClient, blobId, correlationId);
       await handleBulkResult(riApiClient, blobId, importResults);
@@ -32,8 +32,8 @@ export async function startApp(config, riApiClient, melindaApiClient, transforme
     const processingQueueBlobInfo = await processBlobState(profileIds, BLOB_STATE.PROCESSING, importOfflinePeriod);
     if (processingQueueBlobInfo) {
       const {blobId} = processingQueueBlobInfo;
-      debug(`Queue to bulk blob ${blobId}`);
-      await transformedBlobHandler.startHandling(blobId);
+      debug(`Queuing to bulk blob ${blobId}`);
+      await blobImportHandler.startHandling(blobId);
       return logic();
     }
 
