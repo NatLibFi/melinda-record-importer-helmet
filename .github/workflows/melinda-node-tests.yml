@@ -56,6 +56,7 @@ jobs:
         curl -Lfs -o licensed.tar.gz https://github.com/github/licensed/releases/download/3.4.4/licensed-3.4.4-linux-x64.tar.gz
         sudo tar -xzf licensed.tar.gz
         sudo mv licensed /usr/local/bin/licensed
+    - run: licensed cache
     - run: licensed status
 
   quayio:
