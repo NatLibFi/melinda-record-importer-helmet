@@ -45,7 +45,7 @@ jobs:
 
   quayio:
     name: Quay.io image builder & publisher
-    needs: [build-node-versions, njsscan, licensed]
+    needs: [build-node-versions, njsscan]
     runs-on: ubuntu-latest
 
     steps:
