@@ -1,6 +1,6 @@
 {
   "description": "Handle transformed blob - WAITING_FOR_RECORDS to PROCESSED, no messages",
-  "only": true,
+  "only": false,
   "configs": {
     "blobId": "000",
     "profileId": "foobar",
