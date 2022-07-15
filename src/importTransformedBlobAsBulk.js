@@ -21,6 +21,11 @@ export default function (riApiClient, melindaApiClient, amqplib, config) {
     const {correlationId, queueItemState} = await getAndSetCorrelationId(blobId, noopProcessing);
 
     try {
+      if (queueItemState === 'PROCESSED') {
+        await closeAmqpResources({connection, channel});
+        return riApiClient.updateState({id: blobId, state: BLOB_STATE.PROCESSED});
+      }
+
       if (queueItemState === 'WAITING_FOR_RECORDS') {
         const {messageCount} = await channel.assertQueue(blobId, {durable: true});
         debug(`Starting consuming records of blob ${blobId}, Sending ${messageCount} records to ${correlationId} bulk queue.`);
@@ -48,6 +53,12 @@ export default function (riApiClient, melindaApiClient, amqplib, config) {
         const queueItemState = 'WAITING_FOR_RECORDS';
         await riApiClient.setCorrelationId({id, correlationId});
         return {correlationId, queueItemState};
+      }
+
+      // if 0 queued items => processed
+      const {messageCount} = await channel.assertQueue(blobId, {durable: true});
+      if (messageCount === 0) {
+        return {correlationId: 'noop', queueItemState: 'PROCESSED'};
       }
 
       const {correlationId, profile} = await riApiClient.getBlobMetadata({id});
