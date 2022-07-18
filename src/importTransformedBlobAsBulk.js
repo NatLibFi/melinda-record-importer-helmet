@@ -7,7 +7,7 @@ import createDebugLogger from 'debug';
 
 export default function (riApiClient, melindaApiClient, amqplib, config) {
   const debug = createDebugLogger('@natlibfi/melinda-record-import-importer:importTransformedBlobAsBulk');
-  const {amqpUrl, noopProcessing, noopMelindaImport, profileToCataloger, uniqueMelindaImport, mergeMelindaImport} = config;
+  const {amqpUrl, noopProcessing, noopMelindaImport, profileToCataloger, uniqueMelindaImport, mergeMelindaImport, saveImportLogsToBlob} = config;
   return {startHandling};
 
   async function startHandling(blobId) {
@@ -101,7 +101,12 @@ export default function (riApiClient, melindaApiClient, amqplib, config) {
             return consume(blobId, correlationId);
           }
 
-          await riApiClient.setRecordQueued({id: blobId, ...metadata});
+          if (saveImportLogsToBlob) {
+            await riApiClient.setRecordQueued({id: blobId, ...metadata});
+            await channel.ack(message);
+            return consume(blobId, correlationId);
+          }
+
           await channel.ack(message);
           return consume(blobId, correlationId);
         } catch (err) {

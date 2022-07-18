@@ -13,6 +13,8 @@ export const noopMelindaImport = readEnvironmentVariable('NOOP_MELINDA_IMPORT', 
 export const uniqueMelindaImport = readEnvironmentVariable('UNIQUE_MELINDA_IMPORT', {defaultValue: true, format: parseBoolean});
 export const mergeMelindaImport = readEnvironmentVariable('MERGE_MELINDA_IMPORT', {defaultValue: false, format: parseBoolean});
 export const importAsBulk = readEnvironmentVariable('IMPORT_AS_BULK', {defaultValue: true, format: parseBoolean});
+export const saveImportLogsToBlob = readEnvironmentVariable('SAVE_IMPORT_LOGS_TO_BLOB', {defaultValue: false, format: parseBoolean});
+
 
 export const recordImportApiOptions = {
   recordImportApiUrl: readEnvironmentVariable('RECORD_IMPORT_API_URL'),
