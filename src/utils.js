@@ -1,5 +1,5 @@
 export function recordDataBuilder(result) {
-  const {status, message, dublicateIds, conflictIds, databaseId, recordMetadata = {}} = result;
+  const {recordStatus, message, dublicateIds, conflictIds, databaseId, recordMetadata = {}} = result;
   const {sourceIds, title, standardIdentifiers} = recordMetadata;
 
   const metadata = {
@@ -14,12 +14,12 @@ export function recordDataBuilder(result) {
   Object.keys(metadata).forEach(key => metadata[key] === undefined && delete metadata[key]);
 
   if (dublicateIds) {
-    return {status, dublicateIds, metadata};
+    return {status: recordStatus, dublicateIds, metadata};
   }
 
   if (conflictIds) {
-    return {status, conflictIds, metadata};
+    return {status: recordStatus, conflictIds, metadata};
   }
 
-  return {status, metadata};
+  return {status: recordStatus, metadata};
 }
