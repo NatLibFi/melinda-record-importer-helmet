@@ -6,7 +6,7 @@
   "queueItemState": "DONE",
   "records": [
     {
-      "status": "ERROR",
+      "recordStatus": "ERROR",
       "databaseId": "001234567",
       "message": "example",
       "recordMetadata": {

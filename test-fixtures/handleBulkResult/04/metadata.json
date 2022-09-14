@@ -1,5 +1,5 @@
 {
-  "description": "Handle NOT_FOUND record data",
+  "description": "Handle SKIPPED record data",
   "requests": [
     {
       "method": "post",

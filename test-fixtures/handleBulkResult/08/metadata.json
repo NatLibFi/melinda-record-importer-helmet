@@ -1,5 +1,5 @@
 {
-  "description": "Handle DUPLICATE record data",
+  "description": "Does not add same record data again",
   "requests": [
     {
       "method": "post",

@@ -2,7 +2,7 @@ import {handleInterrupt, createLogger} from '@natlibfi/melinda-backend-commons';
 import * as config from './config';
 import {startApp} from './app';
 import {createApiClient as createRecordImportApiClient} from '@natlibfi/melinda-record-import-commons';
-import {createApiClient as createMelindaApiClient} from '@natlibfi/melinda-rest-api-client';
+import {createMelindaApiRecordClient} from '@natlibfi/melinda-rest-api-client';
 import bulkImportBlobHandlerFactory from './importTransformedBlobAsBulk';
 import prioImportBlobHandlerFactory from './importTransformedBlobAsPrio';
 import amqplib from 'amqplib';
@@ -14,7 +14,7 @@ async function run() {
   registerInterruptionHandlers();
 
   const riApiClient = createRecordImportApiClient(config.recordImportApiOptions);
-  const melindaApiClient = createMelindaApiClient(config.melindaApiOptions);
+  const melindaApiClient = createMelindaApiRecordClient(config.melindaApiOptions);
   const blobImportHandler = config.importAsBulk ? bulkImportBlobHandlerFactory(riApiClient, melindaApiClient, amqplib, config) : prioImportBlobHandlerFactory(riApiClient, melindaApiClient, amqplib, config);
 
   await startApp(config, riApiClient, melindaApiClient, blobImportHandler);

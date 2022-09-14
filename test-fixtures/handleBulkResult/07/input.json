@@ -6,9 +6,12 @@
   "queueItemState": "DONE",
   "records": [
     {
-      "status": "UNPROCESSABLE_ENTITY",
+      "recordStatus": "DUPLICATE",
       "databaseId": "001234567",
-      "message": "example",
+      "message": "",
+      "dublicateIds": [
+        "001234567"
+      ],
       "recordMetadata": {
         "blobSequence": "1",
         "standardIdentifiers": [

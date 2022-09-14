@@ -4,7 +4,7 @@ import generateTests from '@natlibfi/fixugen-http-client';
 import blobImportHandlerFactory from './importTransformedBlobAsPrio';
 import createDebugLogger from 'debug';
 import {closeAmqpResources, createApiClient as createRecordImportApiClient} from '@natlibfi/melinda-record-import-commons';
-import {createApiClient as createMelindaApiClient} from '@natlibfi/melinda-rest-api-client';
+import {createMelindaApiRecordClient} from '@natlibfi/melinda-rest-api-client';
 
 const debug = createDebugLogger('@natlibfi/melinda-record-import-importer:importTransformedBlobAsPrio:test');
 const riApiClient = createRecordImportApiClient({
@@ -13,7 +13,7 @@ const riApiClient = createRecordImportApiClient({
   recordImportApiPassword: 'bar'
 });
 
-const melindaApiClient = createMelindaApiClient({
+const melindaApiClient = createMelindaApiRecordClient({
   melindaApiUrl: 'http://foo.bar/',
   melindaApiUsername: 'foo',
   melindaApiPassword: 'bar'

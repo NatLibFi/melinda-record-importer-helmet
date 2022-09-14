@@ -6,18 +6,15 @@
   "queueItemState": "DONE",
   "records": [
     {
-      "status": "DUPLICATE",
-      "databaseId": "001234567",
+      "recordStatus": "CREATED",
+      "melindaId": "001234567",
       "message": "",
-      "dublicateIds": [
-        "001234567"
-      ],
       "recordMetadata": {
         "blobSequence": "1",
         "standardIdentifiers": [
           "978-952-373-345-9"
         ],
-        "sourceIds": ["(MALLI)0239734"],
+        "sourceId": "(MALLI)0239734",
         "title": "example"
       }
     }

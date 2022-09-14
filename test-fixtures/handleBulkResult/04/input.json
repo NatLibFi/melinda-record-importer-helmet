@@ -6,7 +6,7 @@
   "queueItemState": "DONE",
   "records": [
     {
-      "status": "NOT_FOUND",
+      "recordStatus": "SKIPPED",
       "databaseId": "001234567",
       "message": "",
       "recordMetadata": {

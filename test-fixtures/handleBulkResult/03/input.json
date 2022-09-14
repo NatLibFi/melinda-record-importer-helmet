@@ -6,7 +6,7 @@
   "queueItemState": "DONE",
   "records": [
     {
-      "status": "CONFLICT",
+      "recordStatus": "CONFLICT",
       "databaseId": "001234567",
       "message": "Modification history mismatch (CAT)",
       "recordMetadata": {

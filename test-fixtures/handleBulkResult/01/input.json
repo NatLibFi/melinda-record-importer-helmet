@@ -6,7 +6,7 @@
   "queueItemState": "DONE",
   "records": [
     {
-      "status": "CREATED",
+      "recordStatus": "CREATED",
       "databaseId": "001234567",
       "message": "",
       "recordMetadata": {

@@ -4,7 +4,7 @@ import generateTests from '@natlibfi/fixugen-http-client';
 import blobImportHandlerFactory from './importTransformedBlobAsBulk';
 import createDebugLogger from 'debug';
 import {closeAmqpResources, createApiClient as createRecordImportApiClient} from '@natlibfi/melinda-record-import-commons';
-import {createApiClient as createMelindaApiClient} from '@natlibfi/melinda-rest-api-client';
+import {createMelindaApiRecordClient} from '@natlibfi/melinda-rest-api-client';
 
 const debug = createDebugLogger('@natlibfi/melinda-record-import-importer:importTransformedBlobAsBulk:test');
 const riApiClient = createRecordImportApiClient({
@@ -13,7 +13,7 @@ const riApiClient = createRecordImportApiClient({
   recordImportApiPassword: 'bar'
 });
 
-const melindaApiClient = createMelindaApiClient({
+const melindaApiClient = createMelindaApiRecordClient({
   melindaApiUrl: 'http://foo.bar/',
   melindaApiUsername: 'foo',
   melindaApiPassword: 'bar'
@@ -44,12 +44,7 @@ generateTests({
   }
 });
 
-async function callback({getFixture, enabled = true, configs}) {
-  if (enabled === false) {
-    debug('TEST SKIPPED!');
-    return;
-  }
-
+async function callback({getFixture, configs}) {
   // Messages to AMQP queue
   const messages = getFixture('messages.json');
   if (messages.length > 0) { // eslint-disable-line functional/no-conditional-statement

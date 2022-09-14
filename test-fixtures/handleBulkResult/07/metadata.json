@@ -1,5 +1,5 @@
 {
-  "description": "Handle UNPROCESSABLE_ENTITY record data",
+  "description": "Handle DUPLICATE record data",
   "requests": [
     {
       "method": "post",
