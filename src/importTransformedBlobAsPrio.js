@@ -86,7 +86,7 @@ export default function (riApiClient, melindaApiClient, amqplib, config) {
         }
 
         debug('Unexpected status response from rest api.');
-        throw new Error(`Unexpected status response from rest api. ${status}`);
+        throw new Error(`Unexpected status response from rest api. ${result.recordStatus}`);
       } catch (error) {
         if (error.status) {
 
