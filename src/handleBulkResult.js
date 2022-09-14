@@ -28,6 +28,7 @@
 // }
 
 import {BLOB_STATE} from '@natlibfi/melinda-record-import-commons';
+import {recordDataBuilder} from './utils';
 import createDebugLogger from 'debug';
 
 const debug = createDebugLogger('@natlibfi/melinda-record-import-importer:handleBulkResults');
@@ -67,27 +68,5 @@ export async function handleBulkResult(riApiClient, blobId, bulkImportResults) {
 
     await riApiClient.setRecordProcessed({id: blobId, ...recordData});
     return processRecordData(rest, [...handledRecords, recordData]);
-  }
-
-  function recordDataBuilder(record) {
-    const {status, message, dublicateIds, databaseId, recordMetadata = {}} = record;
-    const {sourceIds, title, standardIdentifiers} = recordMetadata;
-
-    const metadata = {
-      id: databaseId,
-      title,
-      standardIdentifiers,
-      sourceIds,
-      message
-    };
-
-    // eslint-disable-next-line functional/immutable-data
-    Object.keys(metadata).forEach(key => metadata[key] === undefined && delete metadata[key]);
-
-    if (dublicateIds) {
-      return {status, dublicateIds, metadata};
-    }
-
-    return {status, metadata};
   }
 }

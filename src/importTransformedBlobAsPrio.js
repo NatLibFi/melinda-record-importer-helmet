@@ -3,6 +3,7 @@ import {MarcRecord} from '@natlibfi/marc-record';
 import {getRecordTitle, getRecordStandardIdentifiers} from '@natlibfi/melinda-commons/';
 import {closeAmqpResources, RECORD_IMPORT_STATE, BLOB_STATE} from '@natlibfi/melinda-record-import-commons';
 import createDebugLogger from 'debug';
+import {recordDataBuilder} from './utils';
 
 
 export default function (riApiClient, melindaApiClient, amqplib, config) {
@@ -77,25 +78,17 @@ export default function (riApiClient, melindaApiClient, amqplib, config) {
         };
 
         debug('Importing record to Melinda...');
-        const {recordId: id, status} = await melindaApiClient.create(recordObject, prioOptions);
+        const result = await melindaApiClient.create(recordObject, prioOptions);
 
-        if (status === httpStatus.CREATED) {
-          debug(`Created new record ${id}`);
-          return {status: RECORD_IMPORT_STATE.CREATED, metadata: {id, title, standardIdentifiers}};
-        }
-
-        if (status === httpStatus.OK) {
-          debug(`Updated record ${id}`);
-          return {status: RECORD_IMPORT_STATE.UPDATED, metadata: {id, title, standardIdentifiers}};
+        if (result.recordStatus !== undefined) {
+          debug(`Status ${result.recordStatus} ${result.databaseId}`);
+          return recordDataBuilder(result);
         }
 
         debug('Unexpected status response from rest api.');
         throw new Error(`Unexpected status response from rest api. ${status}`);
       } catch (error) {
         if (error.status) {
-          if (error.status === httpStatus.CONFLICT) {
-            return {status: RECORD_IMPORT_STATE.DUPLICATE, metadata: {matches: error.payload, title, standardIdentifiers}};
-          }
 
           if (error.status === httpStatus.UNPROCESSABLE_ENTITY) {
             debug('Got expected unprosessable entity response');
