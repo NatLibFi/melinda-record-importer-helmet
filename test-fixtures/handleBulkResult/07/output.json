@@ -9,7 +9,7 @@
       ],
       "title": "example"
     },
-    "dublicateIds": [
+    "ids": [
       "001234567"
     ],
     "status": "DUPLICATE"

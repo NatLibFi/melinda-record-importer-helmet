@@ -14,7 +14,7 @@ export function recordDataBuilder(result) {
   // eslint-disable-next-line functional/immutable-data
   Object.keys(metadata).forEach(key => metadata[key] === undefined && delete metadata[key]);
 
-  if (dublicateIds) {
+  if (ids) {
     return {status: recordStatus, ids, metadata};
   }
 

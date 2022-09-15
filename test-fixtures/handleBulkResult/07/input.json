@@ -9,7 +9,7 @@
       "recordStatus": "DUPLICATE",
       "databaseId": "001234567",
       "message": "",
-      "dublicateIds": [
+      "ids": [
         "001234567"
       ],
       "recordMetadata": {
