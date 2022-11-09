@@ -31,7 +31,6 @@ jobs:
 
   njsscan:
     name: Njsscan check
-    needs: build-node-versions
     runs-on: ubuntu-latest
 
     steps:
@@ -43,9 +42,38 @@ jobs:
       with:
         args: '.'
 
+  license-scan:
+    name: License compliance check
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v3
+      - uses: mikaelvesavuori/license-compliance-action@v1.0.2
+        with:
+          exclude_pattern: /^@natlibfi/
+
+  openshift-webhook:
+    name: OpenShift webhook for image builder
+    needs: [build-node-versions, njsscan]
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Test webhook
+        uses: joelwmale/webhook-action@master
+        if: github.ref == 'refs/heads/test'
+        with:
+          url: ${{ secrets.WEBHOOK_URL_TEST }}
+          body: '{}'
+      - name: Prod webhook
+        uses: joelwmale/webhook-action@master
+        if: github.ref == 'refs/heads/master'
+        with:
+          url: ${{ secrets.WEBHOOK_URL_PROD }}
+          body: '{}'
+
   quayio:
     name: Quay.io image builder & publisher
-    needs: njsscan
+    needs: [build-node-versions, njsscan]
     runs-on: ubuntu-latest
 
     steps:
