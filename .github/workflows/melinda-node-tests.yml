@@ -18,7 +18,7 @@ jobs:
     - name: Checkout the code
       uses: actions/checkout@v3
     - name: Use Node.js ${{ matrix.node-version }}
-      uses: actions/setup-node@v3.4.1
+      uses: actions/setup-node@v3.5.1
       with:
         node-version: ${{ matrix.node-version }}
         cache: 'npm'
@@ -49,9 +49,28 @@ jobs:
 
     steps:
       - uses: actions/checkout@v3
-      - uses: mikaelvesavuori/license-compliance-action@v1.0.1
+      - uses: mikaelvesavuori/license-compliance-action@v1.0.2
         with:
           exclude_pattern: /^@natlibfi/
+
+  openshift-webhook:
+    name: OpenShift webhook for image builder
+    needs: [build-node-versions, njsscan]
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Test webhook
+        uses: joelwmale/webhook-action@master
+        if: github.ref == 'refs/heads/test'
+        with:
+          url: ${{ secrets.WEBHOOK_URL_TEST }}
+          body: '{}'
+      - name: Prod webhook
+        uses: joelwmale/webhook-action@master
+        if: github.ref == 'refs/heads/master'
+        with:
+          url: ${{ secrets.WEBHOOK_URL_PROD }}
+          body: '{}'
 
   quayio:
     name: Quay.io image builder & publisher
