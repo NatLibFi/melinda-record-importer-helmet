@@ -40,6 +40,7 @@ export async function handleBulkResult(riApiClient, blobId, bulkImportResults) {
   const {importResults} = processingInfo;
 
   if (bulkImportResults.records === undefined) {
+    await riApiClient.updateState({id: blobId, state: BLOB_STATE.PROCESSED});
     return [];
   }
 
