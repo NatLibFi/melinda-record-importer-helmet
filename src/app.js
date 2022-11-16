@@ -71,6 +71,11 @@ export async function startApp(config, riApiClient, melindaApiClient, blobImport
       return logic();
     }
 
+    if (melindaRestApiCorrelationId === 'noob') {
+      debug(`There is no pollResults foor ${melindaRestApiCorrelationId}`);
+      return {};
+    }
+
     const poller = pollMelindaRestApi(melindaApiClient, melindaRestApiCorrelationId, true);
     const pollResults = await poller();
     debug(`Got pollResults ${JSON.stringify(pollResults)}`);
