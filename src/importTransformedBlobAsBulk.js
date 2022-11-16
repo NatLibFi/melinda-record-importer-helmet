@@ -3,10 +3,11 @@ import {MarcRecord} from '@natlibfi/marc-record';
 import {getRecordTitle, getRecordStandardIdentifiers} from '@natlibfi/melinda-commons/';
 import {closeAmqpResources, RECORD_IMPORT_STATE, BLOB_STATE} from '@natlibfi/melinda-record-import-commons';
 import createDebugLogger from 'debug';
-
+import {promisify} from 'util';
 
 export default function (riApiClient, melindaApiClient, amqplib, config) {
   const debug = createDebugLogger('@natlibfi/melinda-record-import-importer:importTransformedBlobAsBulk');
+  const setTimeoutPromise = promisify(setTimeout);
   const {amqpUrl, noopProcessing, noopMelindaImport, profileToCataloger, uniqueMelindaImport, mergeMelindaImport, saveImportLogsToBlob} = config;
   return {startHandling};
 
@@ -98,6 +99,7 @@ export default function (riApiClient, melindaApiClient, amqplib, config) {
           debug(`Queuing result: ${JSON.stringify(status)}`);
           if (status === RECORD_IMPORT_STATE.ERROR) {
             await channel.nack(message);
+            await setTimeoutPromise(10);
             return consume(blobId, correlationId);
           }
 

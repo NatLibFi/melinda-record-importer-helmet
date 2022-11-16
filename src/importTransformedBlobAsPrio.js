@@ -4,10 +4,12 @@ import {getRecordTitle, getRecordStandardIdentifiers} from '@natlibfi/melinda-co
 import {closeAmqpResources, RECORD_IMPORT_STATE, BLOB_STATE} from '@natlibfi/melinda-record-import-commons';
 import createDebugLogger from 'debug';
 import {recordDataBuilder} from './utils';
+import {promisify} from 'util';
 
 
 export default function (riApiClient, melindaApiClient, amqplib, config) {
   const debug = createDebugLogger('@natlibfi/melinda-record-import-importer:importTransformedBlobAsPrio');
+  const setTimeoutPromise = promisify(setTimeout);
   const {amqpUrl, noopProcessing, noopMelindaImport, profileToCataloger, uniqueMelindaImport, mergeMelindaImport} = config;
   return {startHandling};
 
@@ -46,6 +48,7 @@ export default function (riApiClient, melindaApiClient, amqplib, config) {
           await channel.ack(message);
           return consume(blobId);
         } catch (err) {
+          await setTimeoutPromise(10);
           await channel.nack(message);
           throw err;
         }
