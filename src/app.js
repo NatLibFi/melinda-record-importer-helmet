@@ -64,16 +64,16 @@ export async function startApp(config, riApiClient, melindaApiClient, blobImport
     const metadata = await riApiClient.getBlobMetadata({id: recordImportBlobId});
     debug(`Got blob metadata from record import, state: ${metadata.state}`);
 
+    if (melindaRestApiCorrelationId === 'noob') {
+      debug(`There is no pollResults for ${melindaRestApiCorrelationId}`);
+      return {};
+    }
+
     if (metadata.state === BLOB_STATE.ABORTED) {
       debug('Blob state is set to ABORTED. Stopping rest api');
       await melindaApiClient.setBulkStatus(melindaRestApiCorrelationId, 'ABORT');
 
       return logic();
-    }
-
-    if (melindaRestApiCorrelationId === 'noob') {
-      debug(`There is no pollResults foor ${melindaRestApiCorrelationId}`);
-      return {};
     }
 
     const poller = pollMelindaRestApi(melindaApiClient, melindaRestApiCorrelationId, true);
