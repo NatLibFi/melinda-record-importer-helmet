@@ -24,7 +24,7 @@ export const recordImportApiOptions = {
 };
 
 export const melindaApiOptions = {
-  melindaApiUrl: readEnvironmentVariable('MELINDA_API_URL', {defaultValue: false}),
+  melindaApiUrl: readEnvironmentVariable('MELINDA_API_URL', {defaultValue: 'MELINDA_API_URL env is not set!'}),
   melindaApiUsername: readEnvironmentVariable('MELINDA_API_USERNAME', {defaultValue: ''}),
   melindaApiPassword: readEnvironmentVariable('MELINDA_API_PASSWORD', {defaultValue: ''})
 };

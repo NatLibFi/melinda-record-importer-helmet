@@ -36,6 +36,10 @@ export default function (riApiClient, melindaApiClient, amqplib, config) {
         debug('Queued all messages.');
 
         await closeAmqpResources({connection, channel});
+        if (correlationId === 'noop') {
+          return riApiClient.updateState({id: blobId, state: BLOB_STATE.PROCESSING_BULK});
+        }
+
         await melindaApiClient.setBulkStatus(correlationId, 'PENDING_VALIDATION');
         return riApiClient.updateState({id: blobId, state: BLOB_STATE.PROCESSING_BULK});
       }
