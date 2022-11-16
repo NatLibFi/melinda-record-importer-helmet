@@ -64,7 +64,7 @@ export async function startApp(config, riApiClient, melindaApiClient, blobImport
     const metadata = await riApiClient.getBlobMetadata({id: recordImportBlobId});
     debug(`Got blob metadata from record import, state: ${metadata.state}`);
 
-    if (melindaRestApiCorrelationId === 'noob') {
+    if (melindaRestApiCorrelationId === 'noop') {
       debug(`There is no pollResults for ${melindaRestApiCorrelationId}`);
       return {};
     }
