@@ -36,6 +36,10 @@ export default function (riApiClient, melindaApiClient, amqplib, config) {
         debug('Queued all messages.');
 
         await closeAmqpResources({connection, channel});
+        if (correlationId === 'noop') {
+          return riApiClient.updateState({id: blobId, state: BLOB_STATE.PROCESSING_BULK});
+        }
+
         await melindaApiClient.setBulkStatus(correlationId, 'PENDING_VALIDATION');
         return riApiClient.updateState({id: blobId, state: BLOB_STATE.PROCESSING_BULK});
       }
@@ -128,7 +132,7 @@ export default function (riApiClient, melindaApiClient, amqplib, config) {
       const recordObject = record.toObject();
       debug(JSON.stringify(recordObject));
 
-      if (noopProcessing || aborted) {
+      if (correlationId === 'noop' || noopProcessing || aborted) {
         debug(`${aborted ? 'Blob has been aborted skipping!' : 'NOOP set. Not importing anything'}`);
         return {status: RECORD_IMPORT_STATE.SKIPPED, metadata: {title, standardIdentifiers}};
       }

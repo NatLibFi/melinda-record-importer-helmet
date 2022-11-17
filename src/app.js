@@ -64,6 +64,11 @@ export async function startApp(config, riApiClient, melindaApiClient, blobImport
     const metadata = await riApiClient.getBlobMetadata({id: recordImportBlobId});
     debug(`Got blob metadata from record import, state: ${metadata.state}`);
 
+    if (melindaRestApiCorrelationId === 'noop') {
+      debug(`There is no pollResults for ${melindaRestApiCorrelationId}`);
+      return {};
+    }
+
     if (metadata.state === BLOB_STATE.ABORTED) {
       debug('Blob state is set to ABORTED. Stopping rest api');
       await melindaApiClient.setBulkStatus(melindaRestApiCorrelationId, 'ABORT');
