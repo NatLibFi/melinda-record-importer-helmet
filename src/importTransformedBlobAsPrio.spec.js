@@ -52,7 +52,7 @@ async function callback({getFixture, enabled = true, configs}) {
 
   // Messages to AMQP queue
   const messages = getFixture('messages.json');
-  if (messages.length > 0) { // eslint-disable-line functional/no-conditional-statement
+  if (messages.length > 0) { // eslint-disable-line functional/no-conditional-statements
     await channel.assertQueue(configs.blobId, {durable: true});
     const messagePromises = messages.map(message => channel.sendToQueue(configs.blobId, Buffer.from(JSON.stringify(message))));
     await Promise.all(messagePromises);
