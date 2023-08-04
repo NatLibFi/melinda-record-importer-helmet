@@ -23,10 +23,10 @@ export async function startApp(config, riApiClient, melindaApiClient, blobImport
     const processingInfo = importAsBulk ? await processBlobState(profileIds, BLOB_STATE.PROCESSING_BULK, importOfflinePeriod) : false;
     debug(`${JSON.stringify(processingInfo)}`);
     if (processingInfo) {
-      const {correlationId, blobId} = processingInfo;
-      debug(`Handling ${BLOB_STATE.PROCESSING_BULK} blob ${blobId}, correlationId: ${correlationId}`);
-      const importResults = await pollResultHandling(melindaApiClient, blobId, correlationId);
-      await handleBulkResult(riApiClient, blobId, importResults);
+      const {correlationId, id} = processingInfo;
+      debug(`Handling ${BLOB_STATE.PROCESSING_BULK} blob ${id}, correlationId: ${correlationId}`);
+      const importResults = await pollResultHandling(melindaApiClient, id, correlationId);
+      await handleBulkResult(riApiClient, id, importResults);
       return logic();
     }
 
