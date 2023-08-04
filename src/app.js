@@ -32,9 +32,9 @@ export async function startApp(config, riApiClient, melindaApiClient, blobImport
     const processingQueueBlobInfo = await processBlobState(profileIds, BLOB_STATE.PROCESSING, importOfflinePeriod);
     debug(`${JSON.stringify(processingQueueBlobInfo)}`);
     if (processingQueueBlobInfo) {
-      const {blobId} = processingQueueBlobInfo;
-      debug(`Queuing to bulk blob ${blobId}`);
-      await blobImportHandler.startHandling(blobId);
+      const {id} = processingQueueBlobInfo;
+      debug(`Queuing to bulk blob ${id}`);
+      await blobImportHandler.startHandling(id);
       return logic();
     }
 
