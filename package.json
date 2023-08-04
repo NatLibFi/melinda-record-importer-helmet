@@ -38,7 +38,7 @@
 		"@natlibfi/marc-record": "^7.2.4",
 		"@natlibfi/melinda-backend-commons": "^2.2.1",
 		"@natlibfi/melinda-commons": "^13.0.5",
-		"@natlibfi/melinda-record-import-commons": "^10.1.7-alpha.1",
+		"@natlibfi/melinda-record-import-commons": "^10.1.7",
 		"@natlibfi/melinda-rest-api-client": "^4.0.2",
 		"@natlibfi/melinda-rest-api-commons": "^4.0.7",
 		"amqplib": ">=0.10.3 <1.0.0",
