@@ -21,6 +21,7 @@ export async function startApp(config, riApiClient, melindaApiClient, blobImport
     // Check if blobs
     debug(`Trying to find blobs for ${profileIds}`); // eslint-disable-line
     const processingInfo = importAsBulk ? await processBlobState(profileIds, BLOB_STATE.PROCESSING_BULK, importOfflinePeriod) : false;
+    debug(`${JSON.stringify(processingInfo)}`);
     if (processingInfo) {
       const {correlationId, blobId} = processingInfo;
       debug(`Handling ${BLOB_STATE.PROCESSING_BULK} blob ${blobId}, correlationId: ${correlationId}`);
