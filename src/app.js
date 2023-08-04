@@ -38,6 +38,7 @@ export async function startApp(config, riApiClient, melindaApiClient, blobImport
     }
 
     const transformedBlobInfo = await processBlobState(profileIds, BLOB_STATE.TRANSFORMED, importOfflinePeriod);
+    debug(`${JSON.stringify(transformedBlobInfo)}`);
     if (transformedBlobInfo) {
       const {blobId} = transformedBlobInfo;
       debug(`Start handling blob ${blobId}`);
