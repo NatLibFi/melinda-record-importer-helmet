@@ -21,27 +21,30 @@ export async function startApp(config, riApiClient, melindaApiClient, blobImport
     // Check if blobs
     debug(`Trying to find blobs for ${profileIds}`); // eslint-disable-line
     const processingInfo = importAsBulk ? await processBlobState(profileIds, BLOB_STATE.PROCESSING_BULK, importOfflinePeriod) : false;
+    debug(`${JSON.stringify(processingInfo)}`);
     if (processingInfo) {
-      const {correlationId, blobId} = processingInfo;
-      debug(`Handling ${BLOB_STATE.PROCESSING_BULK} blob ${blobId}, correlationId: ${correlationId}`);
-      const importResults = await pollResultHandling(melindaApiClient, blobId, correlationId);
-      await handleBulkResult(riApiClient, blobId, importResults);
+      const {correlationId, id} = processingInfo;
+      debug(`Handling ${BLOB_STATE.PROCESSING_BULK} blob ${id}, correlationId: ${correlationId}`);
+      const importResults = await pollResultHandling(melindaApiClient, id, correlationId);
+      await handleBulkResult(riApiClient, id, importResults);
       return logic();
     }
 
     const processingQueueBlobInfo = await processBlobState(profileIds, BLOB_STATE.PROCESSING, importOfflinePeriod);
+    debug(`${JSON.stringify(processingQueueBlobInfo)}`);
     if (processingQueueBlobInfo) {
-      const {blobId} = processingQueueBlobInfo;
-      debug(`Queuing to bulk blob ${blobId}`);
-      await blobImportHandler.startHandling(blobId);
+      const {id} = processingQueueBlobInfo;
+      debug(`Queuing to bulk blob ${id}`);
+      await blobImportHandler.startHandling(id);
       return logic();
     }
 
     const transformedBlobInfo = await processBlobState(profileIds, BLOB_STATE.TRANSFORMED, importOfflinePeriod);
+    debug(`${JSON.stringify(transformedBlobInfo)}`);
     if (transformedBlobInfo) {
-      const {blobId} = transformedBlobInfo;
-      debug(`Start handling blob ${blobId}`);
-      await riApiClient.updateState({id: blobId, state: BLOB_STATE.PROCESSING});
+      const {id} = transformedBlobInfo;
+      debug(`Start handling blob ${id}`);
+      await riApiClient.updateState({id, state: BLOB_STATE.PROCESSING});
       return logic();
     }
 
