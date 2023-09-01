@@ -8,6 +8,6 @@ Helmet record importer for the Melinda record batch import system . Polls Helmet
 
 ## License and copyright
 
-Copyright (c) 2019-2020 **University Of Helsinki (The National Library Of Finland)**
+Copyright (c) 2019-2020, 2023 **University Of Helsinki (The National Library Of Finland)**
 
 [MIT](https://choosealicense.com/licenses/mit/)
